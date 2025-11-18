@@ -39,18 +39,19 @@ async def courses():
     return await render_template("course.html", catalog=catalog, payload=payload, page_title="Каталог курсов")
 
 
-@bp.get("/courses/<string:slug>")
-async def course_details(slug: str):
-    course = get_course_by_slug(slug)
-    if not course:
-        abort(404)
-    payload = {"catalog": [course.model_dump()]}
-    return await render_template(
-        "course.html",
-        catalog=[course],
-        payload=payload,
-        page_title=course.title,
-    )
+# Закомментировано - теперь используется роут из courses blueprint
+# @bp.get("/courses/<string:slug>")
+# async def course_details(slug: str):
+#     course = get_course_by_slug(slug)
+#     if not course:
+#         abort(404)
+#     payload = {"catalog": [course.model_dump()]}
+#     return await render_template(
+#         "course.html",
+#         catalog=[course],
+#         payload=payload,
+#         page_title=course.title,
+#     )
 
 
 @bp.get("/about")

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="buy-page">
+  <div class="buy-container">
+    <div class="buy-header">
+      <h1 class="buy-header__title">✨ Завершение ритуала покупки</h1>
+      <p class="buy-header__subtitle">Ещё мгновение — и магия обучения откроется вам</p>
+    </div>
+
+    <div class="buy-content">
+      <!-- Информация о курсе -->
+      <div class="buy-course">
+        <h2 class="buy-course__title">{{ course.title }}</h2>
+        <p class="buy-course__description">{{ course.tagline }}</p>
+        
+        <div class="buy-course__details">
+          <div class="detail-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 5h2v5H9V5zm0 6h2v2H9v-2z"/>
+            </svg>
+            <span>Доступ сразу после оплаты</span>
+          </div>
+          
+          <div class="detail-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 2l2.5 5 5.5.7-4 3.9 1 5.4-5-2.6-5 2.6 1-5.4-4-3.9 5.5-.7L10 2z"/>
+            </svg>
+            <span>Навсегда в вашей библиотеке</span>
+          </div>
+          
+          <div class="detail-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+            </svg>
+            <span>Все материалы и обновления</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Форма оплаты (mock) -->
+      <div class="buy-payment">
+        <div class="payment-card">
+          <div class="payment-card__header">
+            <h3 class="payment-card__title">Сумма к оплате</h3>
+            <div class="payment-card__price">
+              {{ "{:,}".format(price).replace(',', ' ') }} ₽
+            </div>
+          </div>
+
+          <div class="payment-card__body">
+            <div class="mock-notice">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+              <p>Это демо-версия. При нажатии кнопки курс будет добавлен в ваш личный кабинет автоматически.</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('courses.confirm_purchase', slug=course.slug) }}" class="payment-form">
+              <button type="submit" class="btn btn--primary btn--xlarge btn--full btn--glow">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="currentColor"/>
+                </svg>
+                Получить доступ к курсу
+              </button>
+            </form>
+
+            <p class="payment-card__hint">
+              💡 После получения доступа курс появится в разделе "Мои курсы"
+            </p>
+          </div>
+        </div>
+
+        <div class="payment-security">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 1l6 2v5c0 3.5-2.5 6.5-6 7-3.5-.5-6-3.5-6-7V3l6-2z"/>
+          </svg>
+          <span>Ваши данные защищены магическими чарами</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="{{ url_for('courses.course_detail', slug=course.slug) }}" class="buy-back">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M15 10H5M10 5l-5 5 5 5" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      Вернуться к описанию курса
+    </a>
+  </div>
+
+  <!-- Магические эффекты -->
+  <div class="buy-sparkles">
+    <div class="sparkle sparkle--gold"></div>
+    <div class="sparkle sparkle--purple"></div>
+    <div class="sparkle sparkle--gold"></div>
+    <div class="sparkle sparkle--purple"></div>
+  </div>
+</div>
+{% endblock %}
+

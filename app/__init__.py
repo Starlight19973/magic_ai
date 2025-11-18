@@ -8,6 +8,7 @@ from .database import init_db
 from .routes.auth import bp as auth_bp
 from .routes.public import bp as public_bp
 from .routes.quest import bp as quest_bp
+from .routes.courses import bp as courses_bp
 
 # Quart 0.19.6 использует flask.sansio.App, в котором отсутствует флаг
 # PROVIDE_AUTOMATIC_OPTIONS. Патчим дефолты, чтобы не получать KeyError
@@ -35,6 +36,7 @@ def create_app() -> Quart:
     app.register_blueprint(public_bp)
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(quest_bp)
+    app.register_blueprint(courses_bp)
 
     @app.context_processor
     async def inject_globals():
