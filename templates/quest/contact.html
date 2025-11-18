@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="quest-container quest-container--contact">
+  <!-- Прогресс бар -->
+  <div class="quest-progress">
+    <div class="quest-progress__bar" style="width: {{ progress }}%"></div>
+    <span class="quest-progress__text">{{ progress }}% завершено</span>
+  </div>
+
+  <!-- Карточка контактов -->
+  <div class="quest-card quest-card--contact">
+    <div class="quest-card__icon quest-card__icon--large">
+      📞✨
+    </div>
+    
+    <h1 class="quest-card__title">{{ contact.text }}</h1>
+    
+    <p class="quest-card__description">{{ contact.description }}</p>
+
+    {% if error %}
+    <div class="quest-error">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 5h2v6H9V5zm0 8h2v2H9v-2z"/>
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Форма контактов -->
+    <form method="POST" action="{{ url_for('quest.quest_contact_submit') }}" class="quest-form quest-contact-form">
+      <div class="quest-contact__field">
+        <label for="name" class="quest-contact__label">
+          Как вас зовут? (по желанию)
+        </label>
+        <input 
+          type="text"
+          id="name"
+          name="name" 
+          class="quest-contact__input"
+          placeholder="Иван"
+        />
+      </div>
+
+      <div class="quest-contact__field">
+        <label for="telegram" class="quest-contact__label">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 10c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8-8-3.6-8-8zm12.7-2.7L13 12.9c-.1.4-.4.5-.7.3L10 11.5l-1.6 1.6c-.2.2-.4.2-.6 0l.4-2.8 4.7-4.2c.2-.2 0-.3-.2-.1l-5.8 3.7-2.5-.8c-.5-.2-.5-.5 0-.8l9.7-3.7c.4-.2.8.1.6.7z"/>
+          </svg>
+          Ваш Telegram
+        </label>
+        <input 
+          type="text"
+          id="telegram"
+          name="telegram" 
+          class="quest-contact__input"
+          placeholder="@username или +7 900 123-45-67"
+        />
+      </div>
+
+      <div class="quest-contact__or">
+        <span>или</span>
+      </div>
+
+      <div class="quest-contact__field">
+        <label for="phone" class="quest-contact__label">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+          </svg>
+          Номер телефона
+        </label>
+        <input 
+          type="tel"
+          id="phone"
+          name="phone" 
+          class="quest-contact__input"
+          placeholder="+7 (900) 123-45-67"
+        />
+      </div>
+
+      <div class="quest-contact__hint">
+        💡 Мы свяжемся с вами в течение 24 часов для бесплатной консультации
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--large quest-submit">
+        Продолжить к результатам
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <p class="quest-contact__privacy">
+        Нажимая кнопку, вы соглашаетесь с обработкой персональных данных
+      </p>
+    </form>
+  </div>
+
+  <!-- Магические эффекты -->
+  <div class="quest-sparkles quest-sparkles--intense" aria-hidden="true">
+    <div class="sparkle sparkle--purple"></div>
+    <div class="sparkle sparkle--purple"></div>
+    <div class="sparkle sparkle--gold"></div>
+    <div class="sparkle sparkle--gold"></div>
+    <div class="sparkle sparkle--purple"></div>
+    <div class="sparkle sparkle--gold"></div>
+  </div>
+</div>
+{% endblock %}
+

@@ -32,17 +32,14 @@
 
 ## 🚀 Быстрый старт
 
-### Требования
+### Локальная разработка
 
-- Python 3.11+
-- pip
-
-### Установка
+**Требования**: Python 3.11+
 
 ```bash
 # 1. Клонируйте репозиторий
-git clone https://github.com/yourusername/neuromagic.git
-cd neuromagic
+git clone https://github.com/Starlight19973/magic_ai.git
+cd magic_ai
 
 # 2. Создайте виртуальное окружение
 python -m venv .venv
@@ -64,6 +61,32 @@ quart --app main:app --debug run
 ```
 
 Откройте http://127.0.0.1:5000 в браузере 🎉
+
+### 🐳 Production деплой (Docker)
+
+**Требования**: Docker, Docker Compose
+
+```bash
+# 1. Клонируйте репозиторий
+git clone https://github.com/Starlight19973/magic_ai.git
+cd magic_ai
+
+# 2. Создайте .env файл
+cp .env.production .env
+nano .env  # Настройте SECRET_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+
+# 3. Запустите через Docker
+make docker-build
+make docker-up
+
+# Или без Make:
+docker-compose build
+docker-compose up -d
+```
+
+Приложение доступно на http://ваш-сервер:8000
+
+📖 **Полная документация**: [DEPLOY.md](./DEPLOY.md)
 
 ### 🧪 Тестовый пользователь
 

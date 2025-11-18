@@ -151,6 +151,18 @@ p, ul, ol {
   gap: 6px;
 }
 
+.site-header__logo-link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.site-header__logo-link:hover {
+  transform: translateY(-2px);
+}
+
 .site-header__logo {
   font-family: 'Orbitron', var(--magic-display), sans-serif;
   font-size: 2.2rem;
@@ -1418,5 +1430,740 @@ p, ul, ol {
 
   .user-name {
     font-size: 0.85rem;
+  }
+}
+
+/* ============================================
+   QUEST STYLES (Магический квест)
+   ============================================ */
+
+.quest-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.quest-container--challenge {
+  background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.1), transparent 50%);
+}
+
+.quest-container--results {
+  background: radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.1), transparent 50%);
+}
+
+.quest-container--contact {
+  background: radial-gradient(circle at 50% 50%, rgba(244, 63, 94, 0.1), transparent 50%);
+}
+
+/* Прогресс бар */
+.quest-progress {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.quest-progress__bar {
+  height: 8px;
+  background: linear-gradient(90deg, var(--magic-secondary), var(--magic-accent));
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 20px rgba(168, 85, 247, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.quest-progress__bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.quest-progress__text {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: var(--magic-muted);
+  font-weight: 500;
+}
+
+.quest-progress--complete .quest-progress__bar {
+  background: linear-gradient(90deg, #facc15, #f59e0b);
+  box-shadow: 0 2px 30px rgba(245, 158, 11, 0.6);
+}
+
+.quest-progress--complete .quest-progress__text {
+  color: #facc15;
+  font-weight: 600;
+}
+
+/* Карточка вопроса */
+.quest-card {
+  background: linear-gradient(135deg, rgba(17, 8, 36, 0.95), rgba(6, 1, 15, 0.95));
+  border: 1px solid var(--magic-panel-border);
+  border-radius: 24px;
+  padding: 48px 40px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  position: relative;
+  z-index: 10;
+}
+
+.quest-card--challenge {
+  max-width: 800px;
+  padding: 56px 48px;
+}
+
+.quest-card__icon {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 24px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.quest-card__icon--large {
+  font-size: 64px;
+  margin-bottom: 32px;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.quest-card__title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--magic-text), var(--magic-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.3;
+}
+
+.quest-card__description {
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--magic-muted);
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+/* Подсказка */
+.quest-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  margin-bottom: 32px;
+  color: var(--magic-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.quest-hint svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Ответы */
+.quest-answers {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.quest-answer {
+  position: relative;
+  cursor: pointer;
+}
+
+.quest-answer input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.quest-answer__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid var(--magic-border);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.quest-answer__content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.1), transparent);
+  transition: left 0.6s;
+}
+
+.quest-answer:hover .quest-answer__content {
+  border-color: var(--magic-secondary);
+  background: rgba(168, 85, 247, 0.05);
+  transform: translateX(4px);
+}
+
+.quest-answer:hover .quest-answer__content::before {
+  left: 100%;
+}
+
+.quest-answer input[type="radio"]:checked + .quest-answer__content {
+  border-color: var(--magic-secondary);
+  background: rgba(168, 85, 247, 0.15);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.quest-answer input[type="radio"]:checked + .quest-answer__content .quest-answer__arrow {
+  transform: translateX(4px);
+  color: var(--magic-secondary);
+}
+
+.quest-answer__text {
+  font-size: 1.05rem;
+  color: var(--magic-text);
+  font-weight: 500;
+  flex: 1;
+}
+
+.quest-answer__arrow {
+  font-size: 1.5rem;
+  color: var(--magic-muted);
+  transition: all 0.3s ease;
+  margin-left: 16px;
+}
+
+/* Форма задачки */
+.quest-challenge {
+  margin-bottom: 32px;
+}
+
+.quest-challenge__field {
+  position: relative;
+}
+
+.quest-challenge__label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--magic-text);
+  margin-bottom: 16px;
+}
+
+.quest-challenge__textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid var(--magic-border);
+  border-radius: 16px;
+  color: var(--magic-text);
+  font-size: 1rem;
+  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1.6;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.quest-challenge__textarea:focus {
+  outline: none;
+  border-color: var(--magic-secondary);
+  background: rgba(168, 85, 247, 0.05);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+}
+
+.quest-challenge__textarea::placeholder {
+  color: var(--magic-muted);
+  opacity: 0.6;
+}
+
+.quest-challenge__counter {
+  text-align: right;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--magic-muted);
+}
+
+/* Кнопка отправки */
+.quest-submit {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 1.1rem;
+  padding: 18px 32px;
+}
+
+/* Результаты */
+.quest-results {
+  max-width: 900px;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.quest-results__header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.quest-results__icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: celebrate 1s ease-out;
+}
+
+@keyframes celebrate {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.quest-results__title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.quest-results__message {
+  font-size: 1.2rem;
+  color: var(--magic-muted);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Рекомендации */
+.quest-recommendations {
+  background: linear-gradient(135deg, rgba(17, 8, 36, 0.95), rgba(6, 1, 15, 0.95));
+  border: 1px solid var(--magic-panel-border);
+  border-radius: 24px;
+  padding: 40px;
+  margin-bottom: 32px;
+}
+
+.quest-recommendations__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--magic-text);
+  margin-bottom: 32px;
+}
+
+.quest-recommendations__title svg {
+  color: #facc15;
+  animation: sparkle-rotate 4s linear infinite;
+}
+
+@keyframes sparkle-rotate {
+  0%, 100% { transform: rotate(0) scale(1); }
+  25% { transform: rotate(90deg) scale(1.1); }
+  50% { transform: rotate(180deg) scale(1); }
+  75% { transform: rotate(270deg) scale(1.1); }
+}
+
+.quest-courses {
+  display: grid;
+  gap: 20px;
+}
+
+.quest-course {
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--magic-border);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.quest-course::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--magic-secondary), var(--magic-accent));
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.quest-course:hover {
+  border-color: var(--magic-secondary);
+  background: rgba(168, 85, 247, 0.05);
+  transform: translateY(-2px);
+}
+
+.quest-course:hover::before {
+  transform: scaleY(1);
+}
+
+.quest-course__badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: rgba(168, 85, 247, 0.2);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--magic-secondary);
+  margin-bottom: 12px;
+}
+
+.quest-course__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--magic-text);
+  margin-bottom: 8px;
+}
+
+.quest-course__reason {
+  color: var(--magic-muted);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.quest-course__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.quest-course__tools-label {
+  font-size: 0.85rem;
+  color: var(--magic-muted);
+  font-weight: 500;
+}
+
+.quest-course__tool-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: var(--magic-secondary);
+  font-weight: 500;
+}
+
+/* CTA блок */
+.quest-cta {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(244, 63, 94, 0.15));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+}
+
+.quest-cta__content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.quest-cta__title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--magic-text);
+  margin-bottom: 12px;
+}
+
+.quest-cta__description {
+  font-size: 1.05rem;
+  color: var(--magic-muted);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.quest-cta__actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.quest-cta__note {
+  font-size: 0.9rem;
+  color: var(--magic-muted);
+  line-height: 1.5;
+}
+
+.quest-cta__link {
+  color: var(--magic-secondary);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.quest-cta__link:hover {
+  color: var(--magic-accent);
+}
+
+/* Магические искры */
+.quest-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--magic-secondary);
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle 3s infinite;
+  box-shadow: 0 0 10px var(--magic-secondary);
+}
+
+.sparkle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+.sparkle:nth-child(2) { top: 40%; left: 80%; animation-delay: 0.5s; }
+.sparkle:nth-child(3) { top: 60%; left: 20%; animation-delay: 1s; }
+.sparkle:nth-child(4) { top: 80%; left: 70%; animation-delay: 1.5s; }
+.sparkle:nth-child(5) { top: 30%; left: 50%; animation-delay: 2s; }
+
+.quest-sparkles--intense .sparkle {
+  animation-duration: 2s;
+}
+
+.quest-sparkles--intense .sparkle:nth-child(6) { top: 25%; left: 15%; animation-delay: 0.3s; }
+.quest-sparkles--intense .sparkle:nth-child(7) { top: 55%; left: 85%; animation-delay: 0.8s; }
+.quest-sparkles--intense .sparkle:nth-child(8) { top: 75%; left: 40%; animation-delay: 1.3s; }
+
+.sparkle--gold {
+  background: #facc15;
+  box-shadow: 0 0 15px #facc15;
+}
+
+.sparkle--purple {
+  background: #c084fc;
+  box-shadow: 0 0 15px #c084fc;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* Форма контактов */
+.quest-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.quest-contact__field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quest-contact__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--magic-text);
+}
+
+.quest-contact__label svg {
+  color: var(--magic-secondary);
+  flex-shrink: 0;
+}
+
+.quest-contact__input {
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid var(--magic-border);
+  border-radius: 12px;
+  color: var(--magic-text);
+  font-size: 1rem;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.quest-contact__input:focus {
+  outline: none;
+  border-color: var(--magic-secondary);
+  background: rgba(168, 85, 247, 0.05);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+}
+
+.quest-contact__input::placeholder {
+  color: var(--magic-muted);
+  opacity: 0.6;
+}
+
+.quest-contact__or {
+  position: relative;
+  text-align: center;
+  margin: 8px 0;
+}
+
+.quest-contact__or::before,
+.quest-contact__or::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: var(--magic-border);
+}
+
+.quest-contact__or::before {
+  left: 0;
+}
+
+.quest-contact__or::after {
+  right: 0;
+}
+
+.quest-contact__or span {
+  display: inline-block;
+  padding: 0 16px;
+  background: linear-gradient(135deg, rgba(17, 8, 36, 0.95), rgba(6, 1, 15, 0.95));
+  color: var(--magic-muted);
+  font-size: 0.9rem;
+  position: relative;
+  z-index: 1;
+}
+
+.quest-contact__hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  border-radius: 12px;
+  color: #fca5a5;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.quest-contact__privacy {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--magic-muted);
+  margin-top: -8px;
+}
+
+.quest-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  border-radius: 12px;
+  color: #fca5a5;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.quest-error svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Адаптив для квеста */
+@media (max-width: 768px) {
+  .quest-container {
+    padding: 20px 16px;
+  }
+
+  .quest-card {
+    padding: 32px 24px;
+  }
+
+  .quest-card--challenge,
+  .quest-card--contact {
+    padding: 40px 28px;
+  }
+
+  .quest-card__title {
+    font-size: 1.4rem;
+  }
+
+  .quest-card__icon {
+    font-size: 40px;
+  }
+
+  .quest-card__icon--large {
+    font-size: 56px;
+  }
+
+  .quest-results__title {
+    font-size: 1.75rem;
+  }
+
+  .quest-results__icon {
+    font-size: 64px;
+  }
+
+  .quest-recommendations,
+  .quest-cta {
+    padding: 28px 20px;
+  }
+
+  .quest-cta__actions {
+    flex-direction: column;
+  }
+
+  .quest-cta__actions .btn {
+    width: 100%;
   }
 }

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="quest-container">
+  <!-- Прогресс бар -->
+  <div class="quest-progress">
+    <div class="quest-progress__bar" style="width: {{ progress }}%"></div>
+    <span class="quest-progress__text">{{ progress }}% завершено</span>
+  </div>
+
+  <!-- Карточка вопроса -->
+  <div class="quest-card">
+    <div class="quest-card__icon">
+      🔮
+    </div>
+    
+    <h1 class="quest-card__title">{{ question.text }}</h1>
+    
+    {% if question.description %}
+    <p class="quest-card__description">{{ question.description }}</p>
+    {% endif %}
+
+    <!-- Форма с вариантами ответа -->
+    <form method="POST" action="{{ url_for('quest.quest_answer') }}" class="quest-form">
+      <div class="quest-answers">
+        {% for answer in question.answers %}
+        <label class="quest-answer">
+          <input type="radio" name="answer_id" value="{{ answer.id }}" required />
+          <div class="quest-answer__content">
+            <span class="quest-answer__text">{{ answer.text }}</span>
+            <span class="quest-answer__arrow">→</span>
+          </div>
+        </label>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--large quest-submit">
+        Продолжить путешествие
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- Магические эффекты -->
+  <div class="quest-sparkles" aria-hidden="true">
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+  </div>
+</div>
+{% endblock %}
+

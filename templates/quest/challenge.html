@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="quest-container quest-container--challenge">
+  <!-- Прогресс бар -->
+  <div class="quest-progress">
+    <div class="quest-progress__bar" style="width: {{ progress }}%"></div>
+    <span class="quest-progress__text">{{ progress }}% завершено</span>
+  </div>
+
+  <!-- Карточка задачи -->
+  <div class="quest-card quest-card--challenge">
+    <div class="quest-card__icon quest-card__icon--large">
+      🔮✨
+    </div>
+    
+    <h1 class="quest-card__title">{{ challenge.text }}</h1>
+    
+    <p class="quest-card__description">{{ challenge.description }}</p>
+
+    {% if challenge.hint %}
+    <div class="quest-hint">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm0-9a1 1 0 011 1v4a1 1 0 11-2 0V8a1 1 0 011-1zm0-2a1 1 0 100 2 1 1 0 000-2z"/>
+      </svg>
+      <span>{{ challenge.hint }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Форма с текстовым полем -->
+    <form method="POST" action="{{ url_for('quest.quest_answer') }}" class="quest-form">
+      <div class="quest-challenge">
+        <div class="quest-challenge__field">
+          <label for="answer_text" class="quest-challenge__label">
+            Ваше магическое заклинание:
+          </label>
+          <textarea 
+            id="answer_text"
+            name="answer_text" 
+            class="quest-challenge__textarea"
+            placeholder="{{ challenge.placeholder }}"
+            rows="6"
+            minlength="{{ challenge.min_length }}"
+            required
+          ></textarea>
+          <div class="quest-challenge__counter">
+            <span id="char-count">0</span> символов
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--large quest-submit">
+        Завершить испытание
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- Магические эффекты -->
+  <div class="quest-sparkles quest-sparkles--intense" aria-hidden="true">
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+  </div>
+</div>
+
+<script>
+  // Счётчик символов
+  const textarea = document.getElementById('answer_text');
+  const charCount = document.getElementById('char-count');
+  
+  textarea.addEventListener('input', () => {
+    charCount.textContent = textarea.value.length;
+  });
+</script>
+{% endblock %}
+

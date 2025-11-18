@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="quest-container quest-container--results">
+  <!-- Прогресс бар (завершён) -->
+  <div class="quest-progress quest-progress--complete">
+    <div class="quest-progress__bar" style="width: 100%"></div>
+    <span class="quest-progress__text">✨ Испытание пройдено!</span>
+  </div>
+
+  <!-- Результаты -->
+  <div class="quest-results">
+    <div class="quest-results__header">
+      <div class="quest-results__icon">
+        🎓
+      </div>
+      <h1 class="quest-results__title">Распределение завершено!</h1>
+      <p class="quest-results__message">{{ recommendation.message }}</p>
+    </div>
+
+    <!-- Рекомендованные курсы -->
+    <div class="quest-recommendations">
+      <h2 class="quest-recommendations__title">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        Ваш персональный путь обучения
+      </h2>
+
+      {% if recommendation.recommendations %}
+      <div class="quest-courses">
+        {% for course in recommendation.recommendations %}
+        <div class="quest-course">
+          <div class="quest-course__badge">
+            {% if course.level == 'beginner' %}
+              🌱 Новичок
+            {% elif course.level == 'junior' %}
+              🔥 Базовый
+            {% elif course.level == 'middle' %}
+              ⚡ Продвинутый
+            {% else %}
+              💎 Эксперт
+            {% endif %}
+          </div>
+          <h3 class="quest-course__title">{{ course.title }}</h3>
+          <p class="quest-course__reason">{{ course.reason }}</p>
+          
+          {% if course.tools %}
+          <div class="quest-course__tools">
+            <span class="quest-course__tools-label">Инструменты:</span>
+            {% for tool in course.tools %}
+              <span class="quest-course__tool-badge">{{ tool }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- CTA блок (ненавязчиво) -->
+    <div class="quest-cta">
+      <div class="quest-cta__content">
+        {% if not session.get('user_id') %}
+          <h3 class="quest-cta__title">🎓 Продолжите изучать магию нейросетей!</h3>
+          <p class="quest-cta__description">
+            Зарегистрируйтесь на платформе, чтобы получить:<br>
+            • Доступ к первому уроку бесплатно<br>
+            • Персональный план обучения<br>
+            • Сертификат после прохождения курса<br>
+            • Поддержку наставников в закрытом чате
+          </p>
+          
+          <div class="quest-cta__actions">
+            <a href="{{ url_for('auth.register') }}" class="btn btn--primary btn--large">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M10 5v10M5 10h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Зарегистрироваться и начать
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn--ghost btn--large">
+              Уже есть аккаунт
+            </a>
+          </div>
+
+          <p class="quest-cta__note">
+            💡 Хотите узнать больше? 
+            <a href="{{ url_for('public.index') }}#catalog" class="quest-cta__link">
+              Посмотрите каталог курсов
+            </a> 
+            или 
+            <a href="{{ url_for('quest.quest_restart') }}" class="quest-cta__link">
+              пройдите квест заново
+            </a>
+          </p>
+        {% else %}
+          <h3 class="quest-cta__title">Готовы начать обучение?</h3>
+          <p class="quest-cta__description">
+            Выберите курс из рекомендаций выше и начните своё путешествие в мир AI!
+          </p>
+          
+          <div class="quest-cta__actions">
+            <a href="{{ url_for('public.index') }}#catalog" class="btn btn--primary btn--large">
+              Перейти к каталогу курсов
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Профиль пользователя (скрытый для будущего использования) -->
+    <div class="quest-profile" style="display: none;">
+      <h3>Ваш магический профиль:</h3>
+      <ul>
+        <li>Уровень: {{ recommendation.profile.level }}</li>
+        <li>Интересы: {{ recommendation.profile.interest }}</li>
+        <li>Опыт программирования: {{ recommendation.profile.coding }}</li>
+        <li>Время на обучение: {{ recommendation.profile.time }}</li>
+        <li>Цель: {{ recommendation.profile.goal }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Магические эффекты (успех) -->
+  <div class="quest-sparkles quest-sparkles--success" aria-hidden="true">
+    <div class="sparkle sparkle--gold"></div>
+    <div class="sparkle sparkle--gold"></div>
+    <div class="sparkle sparkle--gold"></div>
+    <div class="sparkle sparkle--gold"></div>
+    <div class="sparkle sparkle--gold"></div>
+    <div class="sparkle sparkle--purple"></div>
+    <div class="sparkle sparkle--purple"></div>
+    <div class="sparkle sparkle--purple"></div>
+  </div>
+</div>
+{% endblock %}
+

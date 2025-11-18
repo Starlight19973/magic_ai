@@ -68,6 +68,13 @@ venv.bak/
 .env
 .env.local
 .env.*.local
+.env.production
+
+# Docker volumes и данные
+data/
+logs/
+backups/
+nginx/ssl/*.pem
 
 # ============================================
 # Database
