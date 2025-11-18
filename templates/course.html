@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="section">
+    <header class="section__header">
+      <p>Каталог</p>
+      <h2>{{ page_title or "Курсы" }}</h2>
+    </header>
+    <div class="card-grid">
+      {% for course in catalog %}
+        {% include "partials/course_card.html" %}
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+

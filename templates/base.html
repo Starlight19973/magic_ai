@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ page_title or "Нейромагия" }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Unbounded:wght@600;800&family=Orbitron:wght@900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=9" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/magic.css') }}?v=9" />
+    {% block meta %}{% endblock %}
+  </head>
+  <body class="magic-body">
+    <div id="magic-cursor"></div>
+    <canvas id="magic-particles" aria-hidden="true"></canvas>
+    <header class="site-header" id="top">
+      <div class="site-header__container">
+        <div class="site-header__bar">
+          <div class="site-header__brand">
+            <span class="site-header__logo">Нейромагия</span>
+            <span class="site-header__tagline">Курсы по AI</span>
+          </div>
+          <nav class="site-header__nav">
+            <a href="/about">О нас</a>
+            <a href="#catalog">Курсы</a>
+            <a href="#contacts">Контакты</a>
+          </nav>
+          <div class="site-header__actions">
+            {% if session.get('user_id') %}
+              <!-- Авторизованный пользователь -->
+              <div class="user-profile" id="userProfile">
+                <img src="{{ session.get('avatar_url') }}" alt="{{ session.get('username') }}" class="user-avatar" />
+                <span class="user-name">{{ session.get('username') }}</span>
+                <svg class="user-arrow" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="user-dropdown" id="userDropdown">
+                  <a href="{{ url_for('auth.logout') }}">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M11 11l3-3-3-3M14 8H6"/>
+                    </svg>
+                    Выйти
+                  </a>
+                </div>
+              </div>
+            {% else %}
+              <!-- Неавторизованный пользователь -->
+              <a class="btn btn--ghost" href="{{ url_for('auth.login') }}">Войти</a>
+              <a class="btn btn--ghost" href="{{ url_for('auth.register') }}">Регистрация</a>
+              <a class="btn btn--primary btn--featured" href="#free">Погрузиться бесплатно</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="magic-shell">
+      {% block content %}{% endblock %}
+    </main>
+    <script type="module" src="{{ url_for('static', filename='js/magic.js') }}?v=5"></script>
+    <script src="{{ url_for('static', filename='js/ui.js') }}?v=8"></script>
+    <footer class="site-footer" id="contacts">
+      <div>
+        <div class="site-footer__column">
+          <p class="site-footer__title">Нейромагия</p>
+          <p>Площадка о нейросетях и практиках, которые помогают командам расти.</p>
+        </div>
+        <div class="site-footer__column">
+          <p class="site-footer__subtitle">Навигация</p>
+          <a href="#about">О платформе</a>
+          <a href="#catalog">Каталог</a>
+          <a href="#top">Кнопки CTA</a>
+        </div>
+        <div class="site-footer__column site-footer__column--right">
+          <p class="site-footer__subtitle">Контакты</p>
+          <a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a>
+          <a href="https://t.me/neuro_magic" target="_blank" rel="noreferrer">Telegram</a>
+          <span>© {{ settings.site_name }} · 2025</span>
+        </div>
+      </div>
+    </footer>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
+

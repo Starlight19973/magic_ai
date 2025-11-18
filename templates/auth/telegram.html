@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Вход через Telegram</h1>
+      <p>Быстрая авторизация с помощью Telegram</p>
+    </div>
+
+    <div class="telegram-widget-container">
+      <p class="telegram-info">
+        Для настройки Telegram OAuth необходимо:
+      </p>
+      <ol class="telegram-steps">
+        <li>Создать бота через <a href="https://t.me/BotFather" target="_blank">@BotFather</a></li>
+        <li>Получить Bot Token</li>
+        <li>Настроить домен в /setdomain</li>
+        <li>Добавить Telegram Login Widget на эту страницу</li>
+      </ol>
+      
+      <!-- TODO: Вставить сюда Telegram Login Widget -->
+      <!-- 
+      <script async src="https://telegram.org/js/telegram-widget.js?22" 
+              data-telegram-login="YOUR_BOT_NAME" 
+              data-size="large" 
+              data-auth-url="{{ url_for('auth.telegram_callback', _external=True) }}"
+              data-request-access="write">
+      </script>
+      -->
+      
+      <div class="telegram-placeholder">
+        <p>🤖 Telegram OAuth будет здесь</p>
+        <p class="text-muted">Настройте бота для активации</p>
+      </div>
+    </div>
+
+    <div class="auth-footer" style="margin-top: 32px;">
+      <p>
+        <a href="{{ url_for('auth.login') }}">← Вернуться к обычному входу</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

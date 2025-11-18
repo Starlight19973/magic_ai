@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="hero" id="about">
+    <p class="hero__eyebrow">обучающая платформа нового поколения</p>
+    <h1>«Нейромагия» помогает каждому познать мир искусственного интеллекта</h1>
+    <p class="hero__text">
+      От первого знакомства с ChatGPT до создания собственных AI-проектов. Учим использовать нейросети 
+      для работы, творчества и бизнеса — без сложных терминов и глубоких технических знаний.
+    </p>
+    <ul class="hero__bullets">
+      <li>Курсы для новичков и профессионалов</li>
+      <li>Практические навыки с первого занятия</li>
+      <li>Поддержка экспертов и готовые шаблоны</li>
+    </ul>
+    <div class="hero__cta">
+      <a class="btn btn--primary" href="#catalog">Выбрать курс</a>
+      <a class="btn btn--ghost" href="mailto:{{ settings.contact_email }}">Связаться с нами</a>
+    </div>
+  </section>
+
+  <section class="section" id="catalog">
+    <header class="section__header">
+      <p>Направления</p>
+      <h2>Выберите курс, который подходит именно вам</h2>
+      <p class="section__lead">От абсолютных новичков до опытных специалистов — каждый найдёт свой путь в мире AI.</p>
+    </header>
+    <div class="card-grid">
+      {% for course in catalog %}
+        {% include "partials/course_card.html" %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="section">
+    <header class="section__header">
+      <p>Отзывы</p>
+      <h2>Наши студенты делятся результатами</h2>
+    </header>
+    <div class="reviews">
+      {% for review in reviews %}
+        <article class="review">
+          <img src="{{ review.avatar }}" alt="{{ review.author }}" />
+          <h3>{{ review.author }}</h3>
+          <p class="review__role">{{ review.role }}</p>
+          <p>{{ review.quote }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+
