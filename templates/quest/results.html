@@ -15,7 +15,7 @@
         🎓
       </div>
       <h1 class="quest-results__title">Распределение завершено!</h1>
-      <p class="quest-results__message">{{ recommendation.message }}</p>
+      <p class="quest-results__message">{{ recommendation.message if recommendation.message else 'Мы подобрали для вас идеальные курсы!' }}</p>
     </div>
 
     <!-- Рекомендованные курсы -->
@@ -110,16 +110,18 @@
     </div>
 
     <!-- Профиль пользователя (скрытый для будущего использования) -->
+    {% if recommendation.get('profile') %}
     <div class="quest-profile" style="display: none;">
       <h3>Ваш магический профиль:</h3>
       <ul>
-        <li>Уровень: {{ recommendation.profile.level }}</li>
-        <li>Интересы: {{ recommendation.profile.interest }}</li>
-        <li>Опыт программирования: {{ recommendation.profile.coding }}</li>
-        <li>Время на обучение: {{ recommendation.profile.time }}</li>
-        <li>Цель: {{ recommendation.profile.goal }}</li>
+        <li>Уровень: {{ recommendation.profile.get('level', 'Не определён') }}</li>
+        <li>Интересы: {{ recommendation.profile.get('interest', 'Не определены') }}</li>
+        <li>Опыт программирования: {{ recommendation.profile.get('coding', 'Не определён') }}</li>
+        <li>Время на обучение: {{ recommendation.profile.get('time', 'Не определено') }}</li>
+        <li>Цель: {{ recommendation.profile.get('goal', 'Не определена') }}</li>
       </ul>
     </div>
+    {% endif %}
   </div>
 
   <!-- Магические эффекты (успех) -->

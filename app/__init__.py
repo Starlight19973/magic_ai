@@ -45,7 +45,6 @@ def create_app() -> Quart:
     async def startup():
         """Инициализация БД перед запуском сервера"""
         await init_db()
-        print("✅ Database initialized")
 
     return app
 

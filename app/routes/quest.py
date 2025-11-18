@@ -104,9 +104,10 @@ async def quest_answer():
                 next_question_id = ans.get('next')
                 break
     elif current_question['type'] == 'text':
-        # Для текстового вопроса
+        # Для текстового вопроса (challenge)
         next_question_id = current_question.get('next')
         answer_data['user_prompt'] = answer_text
+        current_app.logger.info(f"Text question answered: {current_question_id}, next: {next_question_id}")
     
     answers.append(answer_data)
     session['quest_answers'] = answers
@@ -134,6 +135,9 @@ async def quest_challenge():
     
     if not challenge:
         return redirect(url_for('quest.quest_start'))
+    
+    # Обновляем текущий вопрос в сессии
+    session['quest_current'] = 'challenge'
     
     answers = session.get('quest_answers', [])
     progress = 90  # Почти финал
@@ -195,8 +199,11 @@ async def quest_contact_submit():
         'name': name
     }
     
-    # Отправляем в Telegram бот
-    await send_to_telegram_bot(session)
+    # Отправка в Telegram (игнорируем ошибки)
+    try:
+        await send_to_telegram_bot(session)
+    except Exception as e:
+        current_app.logger.error(f"Telegram send failed: {e}")
     
     # Редирект на результаты
     return redirect(url_for('quest.quest_results'))
@@ -208,7 +215,7 @@ async def send_to_telegram_bot(session_data):
     """
     # Получаем токен бота из переменных окружения
     bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-    chat_id = os.getenv('TELEGRAM_CHAT_ID')  # ID чата куда слать заявки
+    chat_id = os.getenv('TELEGRAM_CHAT_ID')
     
     if not bot_token or not chat_id:
         current_app.logger.warning("Telegram bot credentials not configured")
@@ -241,23 +248,23 @@ async def send_to_telegram_bot(session_data):
     
     # Формируем сообщение
     message = f"""
-🎓 **НОВАЯ ЗАЯВКА С КВЕСТА**
+🎓 НОВАЯ ЗАЯВКА С КВЕСТА
 
-👤 **Контакты:**
+👤 Контакты:
 Имя: {contact.get('name', 'Не указано')}
 Telegram: {contact.get('telegram', 'Не указано')}
 Телефон: {contact.get('phone', 'Не указан')}
 
-🎯 **Цель использования AI:**
+🎯 Цель использования AI:
 {purpose or 'Не определена'}
 
-🌐 **Доступ к нейросетям:**
+🌐 Доступ к нейросетям:
 {access or 'Не определён'}
 
-💡 **Проект мечты:**
+💡 Проект мечты:
 {user_project or 'Не указан'}
 
-📚 **Рекомендованные курсы:**
+📚 Рекомендованные курсы:
 {chr(10).join(f"• {course}" for course in courses) if courses else 'Не определены'}
 
 ---
@@ -266,14 +273,20 @@ Telegram: {contact.get('telegram', 'Не указано')}
     
     # Отправляем в Telegram
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-            await client.post(url, json={
+            response = await client.post(url, json={
                 "chat_id": chat_id,
-                "text": message,
-                "parse_mode": "Markdown"
+                "text": message
             })
-            current_app.logger.info(f"Quest application sent to Telegram: {contact.get('telegram', contact.get('phone'))}")
+            
+            result = response.json()
+            
+            if result.get('ok'):
+                current_app.logger.info(f"Quest application sent to Telegram: {contact.get('telegram', contact.get('phone'))}")
+            else:
+                current_app.logger.error(f"Telegram API error: {result}")
+                
     except Exception as e:
         current_app.logger.error(f"Failed to send to Telegram: {e}")
 
@@ -289,15 +302,38 @@ async def quest_results():
     """
     Результаты квеста с рекомендациями
     """
+    # БЕЗ try-except чтобы увидеть полную ошибку!
     answers = session.get('quest_answers', [])
     
     if not answers:
-        return redirect(url_for('quest.quest_start'))
+        # Если нет ответов - создаём базовую рекомендацию
+        answers = [{'purpose': 'general'}]
     
     # Вычисляем рекомендации на основе ответов
-    recommendation = calculate_recommendation(answers)
+    try:
+        recommendation = calculate_recommendation(answers)
+        # Убеждаемся что есть все необходимые поля
+        if not recommendation.get('message'):
+            recommendation['message'] = 'Мы подобрали для вас идеальные курсы!'
+        if not recommendation.get('recommendations'):
+            recommendation['recommendations'] = []
+    except Exception as calc_error:
+        current_app.logger.error(f"calculate_recommendation failed: {calc_error}", exc_info=True)
+        # Создаём базовую рекомендацию при ошибке
+        recommendation = {
+            'title': 'Ваш путь в AI',
+            'message': 'Вы успешно прошли квест! Мы подобрали для вас курсы на основе ваших ответов!',
+            'recommendations': [
+                {
+                    'title': 'AI для повседневной работы',
+                    'level': 'beginner',
+                    'reason': 'Начните использовать AI в работе уже через неделю',
+                    'tools': ['ChatGPT', 'Claude', 'Gemini']
+                }
+            ]
+        }
     
-    # Сохраняем рекомендации в сессию для дальнейшего использования
+    # Сохраняем рекомендации в сессию
     session['quest_recommendation'] = recommendation
     
     return await render_template(
