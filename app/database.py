@@ -45,16 +45,17 @@ async def init_db() -> None:
     """
     # Импортируем все модели чтобы они были зарегистрированы
     from app.models import User, UserCourse, EmailVerification  # noqa: F401
-    from sqlalchemy.exc import OperationalError
+    from loguru import logger
 
     try:
+        logger.info(f"Initializing database: {DATABASE_URL}")
         async with engine.begin() as conn:
             # Создаём только те таблицы, которых ещё нет
             await conn.run_sync(Base.metadata.create_all, checkfirst=True)
-    except OperationalError as e:
-        # Игнорируем ошибку "table already exists" при параллельном старте воркеров
-        if "already exists" not in str(e):
-            raise
+        logger.success("Database initialized successfully!")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {type(e).__name__}: {e}")
+        raise
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
