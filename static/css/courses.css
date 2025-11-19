@@ -139,29 +139,46 @@
 }
 
 .benefit-card {
-  background: #fff;
-  border: 1px solid var(--magic-border);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(139, 92, 246, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 24px;
   display: flex;
   gap: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.benefit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent 70%);
+  pointer-events: none;
 }
 
 .benefit-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(var(--magic-primary-rgb), 0.12);
-  border-color: var(--magic-primary);
+  box-shadow: 0 12px 40px rgba(var(--magic-primary-rgb), 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .benefit-card__icon {
   font-size: 1.5rem;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .benefit-card__text {
   line-height: 1.6;
-  color: var(--magic-text);
+  color: #ffffff;
+  position: relative;
+  z-index: 1;
 }
 
 /* ДЛЯ КОГО */
