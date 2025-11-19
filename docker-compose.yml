@@ -28,6 +28,7 @@ services:
     container_name: neuromagic-app
     restart: unless-stopped
     ports:
+      - "80:8000"
       - "8000:8000"
     volumes:
       # Логи
