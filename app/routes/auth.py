@@ -38,6 +38,7 @@ def verify_telegram_auth(auth_data: dict) -> bool:
     """
     check_hash = auth_data.get('hash')
     if not check_hash:
+        logger.error("No hash in auth_data")
         return False
 
     bot_token = os.getenv('TELEGRAM_OAUTH_BOT_TOKEN')
@@ -45,12 +46,16 @@ def verify_telegram_auth(auth_data: dict) -> bool:
         logger.error("TELEGRAM_OAUTH_BOT_TOKEN not configured")
         return False
 
+    logger.info("Starting hash verification")
+
     # Создаем копию данных без hash
     auth_data_copy = {k: v for k, v in auth_data.items() if k != 'hash'}
 
     # Сортируем по ключам и создаем строку data_check_string
     data_check_arr = [f"{k}={v}" for k, v in sorted(auth_data_copy.items())]
     data_check_string = '\n'.join(data_check_arr)
+
+    logger.info(f"Data check string:\n{data_check_string}")
 
     # Создаем secret_key = SHA256(bot_token)
     secret_key = hashlib.sha256(bot_token.encode()).digest()
@@ -62,8 +67,13 @@ def verify_telegram_auth(auth_data: dict) -> bool:
         hashlib.sha256
     ).hexdigest()
 
+    logger.info(f"Calculated hash: {calculated_hash}")
+    logger.info(f"Received hash: {check_hash}")
+
     # Сравниваем с полученным hash
-    return hmac.compare_digest(calculated_hash, check_hash)
+    result = hmac.compare_digest(calculated_hash, check_hash)
+    logger.info(f"Hash verification result: {result}")
+    return result
 
 
 # ============================================
@@ -416,6 +426,11 @@ async def telegram_login():
     Документация: https://core.telegram.org/widgets/login
     """
     bot_username = os.getenv("TELEGRAM_OAUTH_BOT_USERNAME")
+    bot_token = os.getenv("TELEGRAM_OAUTH_BOT_TOKEN")
+
+    logger.info(f"Telegram login page accessed")
+    logger.info(f"Bot username configured: {bot_username}")
+    logger.info(f"Bot token configured: {'Yes' if bot_token else 'No'}")
 
     return await render_template(
         "auth/telegram.html",
@@ -444,6 +459,10 @@ async def telegram_callback():
     # Telegram Login Widget отправляет данные через GET параметры
     auth_data = dict(request.args)
 
+    logger.info(f"Telegram callback received")
+    logger.info(f"Auth data keys: {list(auth_data.keys())}")
+    logger.info(f"Auth data (without hash): {dict((k, v) for k, v in auth_data.items() if k != 'hash')}")
+
     if not auth_data or 'id' not in auth_data:
         logger.warning("Telegram callback called without required data")
         await flash("Ошибка авторизации через Telegram", "error")
@@ -451,7 +470,8 @@ async def telegram_callback():
 
     # Верификация подлинности данных
     if not verify_telegram_auth(auth_data):
-        logger.warning(f"Invalid Telegram auth data: {auth_data.get('id')}")
+        logger.warning(f"Invalid Telegram auth data for user ID: {auth_data.get('id')}")
+        logger.error("Hash verification failed!")
         await flash("Неверная подпись данных от Telegram. Попробуйте снова.", "error")
         return redirect(url_for("auth.login"))
 
