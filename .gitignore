@@ -71,7 +71,7 @@ venv.bak/
 .env.production
 
 # Docker volumes и данные
-data/
+/data/
 logs/
 backups/
 nginx/ssl/*.pem
