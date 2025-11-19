@@ -240,23 +240,39 @@
 }
 
 .module-card {
-  background: #fff;
-  border: 2px solid var(--magic-border);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(139, 92, 246, 0.95));
+  border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 32px;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.module-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.1), transparent 60%);
+  pointer-events: none;
 }
 
 .module-card:hover {
-  border-color: var(--magic-primary);
-  box-shadow: 0 8px 32px rgba(var(--magic-primary-rgb), 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(var(--magic-primary-rgb), 0.4);
+  transform: translateY(-2px);
 }
 
 .module-card__title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--magic-text);
+  color: #ffffff;
   margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .module-card__lessons {
@@ -273,21 +289,25 @@
   padding: 12px;
   border-radius: 8px;
   transition: background 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .lesson-item:hover {
-  background: rgba(var(--magic-primary-rgb), 0.05);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .lesson-item svg {
-  color: var(--magic-primary);
+  color: #ffffff;
   flex-shrink: 0;
   margin-top: 2px;
+  opacity: 0.9;
 }
 
 .lesson-item span {
-  color: var(--magic-text);
+  color: #ffffff;
   line-height: 1.5;
+  opacity: 0.95;
 }
 
 /* ИНСТРУМЕНТЫ */

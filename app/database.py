@@ -10,8 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.models import Base
 
 # Путь к файлу БД
+import os
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATABASE_URL = f"sqlite+aiosqlite:///{BASE_DIR}/neuromagic.db"
+# Используем переменную окружения или дефолтный путь в data/
+DATABASE_PATH = os.getenv("DATABASE_URL", f"sqlite+aiosqlite:///{BASE_DIR}/data/neuromagic.db")
+DATABASE_URL = DATABASE_PATH
 
 # Создание асинхронного движка
 engine = create_async_engine(
