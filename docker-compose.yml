@@ -15,7 +15,7 @@ services:
     networks:
       - neuromagic-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-neuromagic_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-neuromagic_user} -d ${POSTGRES_DB:-neuromagic}"]
       interval: 10s
       timeout: 5s
       retries: 5
