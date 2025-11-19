@@ -650,6 +650,14 @@ p, ul, ol {
   margin-top: 8px;
 }
 
+.footer-inn {
+  font-size: 0.85rem !important;
+  opacity: 0.8;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin-top: 4px !important;
+}
+
 .site-footer__column--right {
   text-align: right;
   align-items: flex-end;
