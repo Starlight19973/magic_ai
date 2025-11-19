@@ -26,25 +26,52 @@ jobs:
             cd /opt/neuromagic
             
             # Останавливаем контейнеры
+            echo "🛑 Stopping containers..."
             docker-compose down
             
+            # Ждём полной остановки
+            sleep 3
+            
             # Обновляем код
+            echo "📥 Pulling latest code..."
             git pull origin main
             
             # Пересобираем образы
+            echo "🔨 Building images..."
             docker-compose build --no-cache
             
             # Запускаем с nginx
+            echo "🚀 Starting containers..."
             docker-compose --profile production up -d
             
+            # Ждём старта
+            echo "⏳ Waiting for containers to start..."
+            sleep 10
+            
             # Проверяем статус
+            echo "📊 Container status:"
             docker-compose ps
             
             # Показываем логи
-            docker-compose logs --tail=50
+            echo "📋 Application logs:"
+            docker-compose logs --tail=50 app
       
       - name: Health Check
         run: |
-          sleep 10
-          curl -f http://138.124.15.60 || exit 1
+          echo "Waiting for application to start..."
+          sleep 30
+          
+          # Попытка 5 раз с интервалом 10 секунд
+          for i in {1..5}; do
+            echo "Attempt $i/5..."
+            if curl -f http://138.124.15.60; then
+              echo "✅ Application is up!"
+              exit 0
+            fi
+            echo "Waiting 10 more seconds..."
+            sleep 10
+          done
+          
+          echo "❌ Application failed to start"
+          exit 1
 
