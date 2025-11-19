@@ -667,7 +667,7 @@ p, ul, ol {
 }
 
 .contact-card {
-  background: #fff;
+  background: linear-gradient(135deg, rgba(17, 8, 36, 0.95), rgba(6, 1, 15, 0.95));
   border: 2px solid var(--magic-border);
   border-radius: 16px;
   padding: 32px;
@@ -729,7 +729,7 @@ p, ul, ol {
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: #fff;
+  background: linear-gradient(135deg, rgba(17, 8, 36, 0.95), rgba(6, 1, 15, 0.95));
   border-radius: 12px;
   border: 1px solid var(--magic-border);
 }
