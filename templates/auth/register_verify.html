@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Подтверждение email</h1>
+      <p>Мы отправили код на <strong>{{ email }}</strong></p>
+    </div>
+
+    {% if errors %}
+    <div class="auth-errors">
+      {% for error in errors %}
+      <div class="auth-error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('auth.register_verify') }}" class="auth-form" id="verify-form">
+      <div class="form-group">
+        <label for="code">Код подтверждения</label>
+        <input
+          type="text"
+          id="code"
+          name="code"
+          required
+          minlength="6"
+          maxlength="6"
+          placeholder="000000"
+          class="form-input code-input"
+          autocomplete="off"
+          pattern="[0-9]{6}"
+          inputmode="numeric"
+        />
+        <span class="form-hint">Введите 6-значный код из письма</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        Подтвердить
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Не пришло письмо?</p>
+      <button type="button" class="btn btn-link" id="resend-btn">
+        Отправить код повторно
+      </button>
+      <p class="resend-timer" id="resend-timer" style="display: none;">
+        Повторная отправка доступна через <span id="timer-seconds">60</span>с
+      </p>
+    </div>
+
+    <div class="auth-back">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-text">
+        ← Вернуться к регистрации
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+.code-input {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 8px;
+  font-family: 'Courier New', monospace;
+}
+
+.auth-footer {
+  margin-top: 30px;
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-footer p {
+  margin: 10px 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+.resend-timer {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+
+.auth-back {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.btn-text {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.btn-text:hover {
+  color: rgba(255, 255, 255, 1);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const resendBtn = document.getElementById('resend-btn');
+  const resendTimer = document.getElementById('resend-timer');
+  const timerSeconds = document.getElementById('timer-seconds');
+  const codeInput = document.getElementById('code');
+
+  let timerActive = false;
+  let secondsLeft = 60;
+
+  // Автофокус на поле ввода кода
+  codeInput.focus();
+
+  // Разрешаем только цифры в поле кода
+  codeInput.addEventListener('input', function(e) {
+    this.value = this.value.replace(/[^0-9]/g, '');
+    if (this.value.length > 6) {
+      this.value = this.value.slice(0, 6);
+    }
+  });
+
+  // Повторная отправка кода
+  resendBtn.addEventListener('click', async function() {
+    if (timerActive) return;
+
+    try {
+      const response = await fetch('{{ url_for("auth.register_resend") }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Показываем уведомление
+        showNotification('Код отправлен повторно!', 'success');
+
+        // Запускаем таймер
+        startTimer();
+      } else {
+        showNotification(data.error || 'Ошибка отправки кода', 'error');
+      }
+    } catch (error) {
+      showNotification('Ошибка сети', 'error');
+    }
+  });
+
+  function startTimer() {
+    timerActive = true;
+    secondsLeft = 60;
+    resendBtn.style.display = 'none';
+    resendTimer.style.display = 'block';
+
+    const interval = setInterval(function() {
+      secondsLeft--;
+      timerSeconds.textContent = secondsLeft;
+
+      if (secondsLeft <= 0) {
+        clearInterval(interval);
+        timerActive = false;
+        resendBtn.style.display = 'inline-block';
+        resendTimer.style.display = 'none';
+      }
+    }, 1000);
+  }
+
+  function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: ${type === 'success' ? '#10b981' : '#ef4444'};
+      color: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  // CSS анимации
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+});
+</script>
+{% endblock %}

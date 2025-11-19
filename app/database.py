@@ -34,9 +34,9 @@ async def init_db() -> None:
     Создаёт все таблицы, определённые в моделях.
     """
     # Импортируем все модели чтобы они были зарегистрированы
-    from app.models import User, UserCourse  # noqa: F401
+    from app.models import User, UserCourse, EmailVerification  # noqa: F401
     from sqlalchemy.exc import OperationalError
-    
+
     try:
         async with engine.begin() as conn:
             # Создаём только те таблицы, которых ещё нет
