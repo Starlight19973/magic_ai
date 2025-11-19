@@ -5,10 +5,15 @@
 import os
 import smtplib
 import random
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional
 from loguru import logger
+
+# Thread pool для выполнения синхронных SMTP операций
+_executor = ThreadPoolExecutor(max_workers=3)
 
 
 def generate_verification_code() -> str:
@@ -21,17 +26,10 @@ def generate_verification_code() -> str:
     return ''.join([str(random.randint(0, 9)) for _ in range(6)])
 
 
-async def send_verification_email(email: str, code: str, username: str = "") -> bool:
+def _send_email_sync(email: str, code: str, username: str = "") -> bool:
     """
-    Отправляет email с кодом верификации.
-
-    Args:
-        email: Email получателя
-        code: 6-значный код верификации
-        username: Имя пользователя (опционально)
-
-    Returns:
-        bool: True если отправлено успешно, False в случае ошибки
+    Синхронная функция отправки email.
+    Вызывается из async функции через ThreadPoolExecutor.
     """
     try:
         # Получаем настройки SMTP из переменных окружения
@@ -39,8 +37,9 @@ async def send_verification_email(email: str, code: str, username: str = "") -> 
         smtp_port = int(os.getenv("SMTP_PORT", "465"))
         smtp_user = os.getenv("SMTP_USER")
         smtp_password = os.getenv("SMTP_PASSWORD")
-        smtp_from_email = os.getenv("SMTP_FROM_EMAIL", smtp_user)
         smtp_from_name = os.getenv("SMTP_FROM_NAME", "Нейромагия")
+        # ВАЖНО: From должен точно совпадать с smtp_user для Яндекса
+        smtp_from_email = smtp_user
 
         if not smtp_user or not smtp_password:
             logger.error("SMTP credentials not configured in .env")
@@ -49,7 +48,8 @@ async def send_verification_email(email: str, code: str, username: str = "") -> 
         # Создаем сообщение
         msg = MIMEMultipart('alternative')
         msg['Subject'] = f'Код подтверждения регистрации на Нейромагии: {code}'
-        msg['From'] = f'{smtp_from_name} <{smtp_from_email}>'
+        # Яндекс требует простой формат From без имени отправителя
+        msg['From'] = smtp_from_email
         msg['To'] = email
 
         # HTML версия письма
@@ -80,13 +80,17 @@ https://neuromagicai.ru
         # Отправляем письмо
         if smtp_port == 465:
             # SSL соединение
-            with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+            with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as server:
+                server.set_debuglevel(0)
                 server.login(smtp_user, smtp_password)
                 server.send_message(msg)
         else:
-            # STARTTLS соединение
-            with smtplib.SMTP(smtp_host, smtp_port) as server:
+            # STARTTLS соединение (порт 587 или 25)
+            with smtplib.SMTP(smtp_host, smtp_port, timeout=10) as server:
+                server.set_debuglevel(0)
+                server.ehlo()
                 server.starttls()
+                server.ehlo()
                 server.login(smtp_user, smtp_password)
                 server.send_message(msg)
 
@@ -94,7 +98,13 @@ https://neuromagicai.ru
         return True
 
     except Exception as e:
-        logger.error(f"Failed to send email to {email}: {str(e)}")
+        error_msg = f"Failed to send email to {email}: {str(e)}"
+        logger.error(error_msg)
+        print(f"[EMAIL ERROR] {error_msg}")  # Вывод в консоль
+        print(f"[EMAIL ERROR] Exception type: {type(e).__name__}")
+        print(f"[EMAIL ERROR] SMTP settings: host={smtp_host}, port={smtp_port}, user={smtp_user}")
+        import traceback
+        traceback.print_exc()  # Полный traceback в консоль
         return False
 
 
@@ -201,3 +211,20 @@ def _get_email_html_template(code: str, username: str = "") -> str:
 </body>
 </html>
     """
+
+
+async def send_verification_email(email: str, code: str, username: str = "") -> bool:
+    """
+    Async обертка для отправки email с кодом верификации.
+    Выполняет синхронную SMTP операцию в отдельном потоке.
+
+    Args:
+        email: Email получателя
+        code: 6-значный код верификации
+        username: Имя пользователя (опционально)
+
+    Returns:
+        bool: True если отправлено успешно, False в случае ошибки
+    """
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(_executor, _send_email_sync, email, code, username)
