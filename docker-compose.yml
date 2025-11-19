@@ -82,6 +82,7 @@ services:
     image: nginx:alpine
     container_name: neuromagic-nginx
     restart: unless-stopped
+    pull_policy: always
     ports:
       - "80:80"
       - "443:443"
@@ -90,9 +91,20 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./static:/app/static:ro
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     networks:
       - neuromagic-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/static/favicon.svg"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.neuromagic.service=nginx"
+      - "com.neuromagic.version=1.1"
+      - "com.neuromagic.updated=2025-11-20"
 
 networks:
   neuromagic-network:
