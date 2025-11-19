@@ -6,6 +6,9 @@ from quart import Blueprint, redirect, render_template, request, session, url_fo
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
+import hashlib
+import hmac
+import os
 
 from app.database import get_session
 from app.models import User, EmailVerification
@@ -15,6 +18,52 @@ from pydantic import ValidationError
 from loguru import logger
 
 bp = Blueprint("auth", __name__)
+
+
+# ============================================
+# TELEGRAM HASH VERIFICATION
+# ============================================
+def verify_telegram_auth(auth_data: dict) -> bool:
+    """
+    Верификация подлинности данных от Telegram Login Widget.
+
+    Алгоритм согласно документации Telegram:
+    https://core.telegram.org/widgets/login#checking-authorization
+
+    Args:
+        auth_data: Словарь с данными от Telegram (id, first_name, username, photo_url, auth_date, hash)
+
+    Returns:
+        bool: True если данные подлинные, False если поддельные
+    """
+    check_hash = auth_data.get('hash')
+    if not check_hash:
+        return False
+
+    bot_token = os.getenv('TELEGRAM_OAUTH_BOT_TOKEN')
+    if not bot_token:
+        logger.error("TELEGRAM_OAUTH_BOT_TOKEN not configured")
+        return False
+
+    # Создаем копию данных без hash
+    auth_data_copy = {k: v for k, v in auth_data.items() if k != 'hash'}
+
+    # Сортируем по ключам и создаем строку data_check_string
+    data_check_arr = [f"{k}={v}" for k, v in sorted(auth_data_copy.items())]
+    data_check_string = '\n'.join(data_check_arr)
+
+    # Создаем secret_key = SHA256(bot_token)
+    secret_key = hashlib.sha256(bot_token.encode()).digest()
+
+    # Вычисляем hash = HMAC_SHA256(data_check_string, secret_key)
+    calculated_hash = hmac.new(
+        secret_key,
+        data_check_string.encode(),
+        hashlib.sha256
+    ).hexdigest()
+
+    # Сравниваем с полученным hash
+    return hmac.compare_digest(calculated_hash, check_hash)
 
 
 # ============================================
@@ -86,7 +135,7 @@ async def register():
             email_sent = await send_verification_email(form.email, code, form.username)
 
             if not email_sent:
-                errors.append("Не удалось отправить email. Проверьте настройки SMTP в .env")
+                errors.append("Не удалось отправить код на почту. Возникли технические неполадки. Попробуйте позже.")
                 return await render_template(
                     "auth/register.html",
                     errors=errors,
@@ -353,79 +402,111 @@ async def logout():
 
 
 # ============================================
-# TELEGRAM OAUTH (заглушка для будущей реализации)
+# TELEGRAM OAUTH
 # ============================================
 @bp.route("/telegram")
 async def telegram_login():
     """
     OAuth через Telegram.
-    
-    TODO: Реализовать полную интеграцию с Telegram Login Widget:
-    1. Получить bot token от BotFather
-    2. Настроить Telegram Login Widget на фронтенде
-    3. Верифицировать данные от Telegram (hash проверка)
-    4. Создать или обновить пользователя с telegram_id
-    
+
+    Отображает страницу с Telegram Login Widget.
+    Если TELEGRAM_OAUTH_BOT_USERNAME настроен, показывает виджет.
+    Иначе показывает инструкции по настройке.
+
     Документация: https://core.telegram.org/widgets/login
     """
+    bot_username = os.getenv("TELEGRAM_OAUTH_BOT_USERNAME")
+
     return await render_template(
         "auth/telegram.html",
-        page_title="Вход через Telegram"
+        page_title="Вход через Telegram",
+        bot_username=bot_username
     )
 
 
 # ============================================
 # CALLBACK ДЛЯ TELEGRAM
 # ============================================
-@bp.route("/telegram/callback", methods=["POST"])
+@bp.route("/telegram/callback")
 async def telegram_callback():
     """
     Callback endpoint для Telegram OAuth.
     Принимает данные от Telegram Login Widget и создаёт/авторизует пользователя.
-    
-    Параметры от Telegram:
+
+    Параметры от Telegram (GET query params):
     - id: Telegram user ID
     - first_name: имя
     - username: username в Telegram (опционально)
     - photo_url: URL аватара (опционально)
     - auth_date: timestamp авторизации
     - hash: подпись данных
-    
-    TODO: Добавить проверку hash для безопасности
     """
-    form_data = await request.form
-    telegram_id = form_data.get("id")
-    telegram_username = form_data.get("username")
-    first_name = form_data.get("first_name", "User")
-    photo_url = form_data.get("photo_url")
-    
-    if not telegram_id:
+    # Telegram Login Widget отправляет данные через GET параметры
+    auth_data = dict(request.args)
+
+    if not auth_data or 'id' not in auth_data:
+        logger.warning("Telegram callback called without required data")
+        await flash("Ошибка авторизации через Telegram", "error")
         return redirect(url_for("auth.login"))
-    
-    async for db in get_session():
-        # Поиск пользователя по telegram_id
-        result = await db.execute(select(User).where(User.telegram_id == int(telegram_id)))
-        user = result.scalar_one_or_none()
-        
-        if not user:
-            # Создание нового пользователя
-            username = telegram_username or f"tg_{telegram_id}"
-            email = f"{telegram_id}@telegram.user"  # фиктивный email
-            
-            user = User(
-                username=username,
-                email=email,
-                telegram_id=int(telegram_id),
-                telegram_username=telegram_username,
-                avatar_url=photo_url or f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}"
-            )
-            db.add(user)
-            await db.commit()
-            await db.refresh(user)
-        
-        # Авторизация
-        session["user_id"] = user.id
-        session["username"] = user.username
-        session["avatar_url"] = user.avatar_url
-        
-        return redirect(url_for("public.index"))
+
+    # Верификация подлинности данных
+    if not verify_telegram_auth(auth_data):
+        logger.warning(f"Invalid Telegram auth data: {auth_data.get('id')}")
+        await flash("Неверная подпись данных от Telegram. Попробуйте снова.", "error")
+        return redirect(url_for("auth.login"))
+
+    telegram_id = auth_data.get("id")
+    telegram_username = auth_data.get("username")
+    first_name = auth_data.get("first_name", "User")
+    photo_url = auth_data.get("photo_url")
+
+    try:
+        async for db in get_session():
+            # Поиск пользователя по telegram_id
+            result = await db.execute(select(User).where(User.telegram_id == int(telegram_id)))
+            user = result.scalar_one_or_none()
+
+            if not user:
+                # Проверяем, не занят ли username
+                username = telegram_username or f"tg_{telegram_id}"
+                result = await db.execute(select(User).where(User.username == username))
+                if result.scalar_one_or_none():
+                    # Username занят, добавляем ID
+                    username = f"{username}_{telegram_id}"
+
+                # Создание нового пользователя
+                email = f"{telegram_id}@telegram.user"  # фиктивный email для Telegram пользователей
+
+                user = User(
+                    username=username,
+                    email=email,
+                    telegram_id=int(telegram_id),
+                    telegram_username=telegram_username,
+                    avatar_url=photo_url or f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}"
+                )
+                db.add(user)
+                await db.commit()
+                await db.refresh(user)
+
+                logger.info(f"New user created via Telegram: {username} (TG ID: {telegram_id})")
+            else:
+                # Обновляем аватар и username если изменились в Telegram
+                if photo_url and user.avatar_url != photo_url:
+                    user.avatar_url = photo_url
+                if telegram_username and user.telegram_username != telegram_username:
+                    user.telegram_username = telegram_username
+                await db.commit()
+
+                logger.info(f"User logged in via Telegram: {user.username} (TG ID: {telegram_id})")
+
+            # Авторизация
+            session["user_id"] = user.id
+            session["username"] = user.username
+            session["avatar_url"] = user.avatar_url
+
+            return redirect(url_for("public.index"))
+
+    except Exception as e:
+        logger.error(f"Telegram callback error: {str(e)}")
+        await flash("Произошла ошибка при авторизации через Telegram", "error")
+        return redirect(url_for("auth.login"))

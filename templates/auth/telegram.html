@@ -9,30 +9,38 @@
     </div>
 
     <div class="telegram-widget-container">
-      <p class="telegram-info">
-        Для настройки Telegram OAuth необходимо:
-      </p>
-      <ol class="telegram-steps">
-        <li>Создать бота через <a href="https://t.me/BotFather" target="_blank">@BotFather</a></li>
-        <li>Получить Bot Token</li>
-        <li>Настроить домен в /setdomain</li>
-        <li>Добавить Telegram Login Widget на эту страницу</li>
-      </ol>
-      
-      <!-- TODO: Вставить сюда Telegram Login Widget -->
-      <!-- 
-      <script async src="https://telegram.org/js/telegram-widget.js?22" 
-              data-telegram-login="YOUR_BOT_NAME" 
-              data-size="large" 
-              data-auth-url="{{ url_for('auth.telegram_callback', _external=True) }}"
-              data-request-access="write">
-      </script>
-      -->
-      
-      <div class="telegram-placeholder">
-        <p>🤖 Telegram OAuth будет здесь</p>
-        <p class="text-muted">Настройте бота для активации</p>
-      </div>
+      {% if bot_username %}
+        <!-- Telegram Login Widget -->
+        <div class="telegram-widget-wrapper">
+          <p class="telegram-info">Войдите через Telegram одним нажатием:</p>
+          <script async src="https://telegram.org/js/telegram-widget.js?22"
+                  data-telegram-login="{{ bot_username }}"
+                  data-size="large"
+                  data-auth-url="{{ url_for('auth.telegram_callback', _external=True) }}"
+                  data-request-access="write">
+          </script>
+        </div>
+      {% else %}
+        <!-- Инструкции по настройке -->
+        <p class="telegram-info">
+          Для настройки Telegram OAuth необходимо:
+        </p>
+        <ol class="telegram-steps">
+          <li>Создать бота через <a href="https://t.me/BotFather" target="_blank">@BotFather</a></li>
+          <li>Получить Bot Token и Bot Username</li>
+          <li>Настроить домен в /setdomain</li>
+          <li>Добавить переменные в .env:
+            <pre style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-top: 10px;">
+TELEGRAM_OAUTH_BOT_TOKEN=ваш_API_KEY
+TELEGRAM_OAUTH_BOT_USERNAME=имя_бота_без_@</pre>
+          </li>
+        </ol>
+
+        <div class="telegram-placeholder">
+          <p>🤖 Telegram OAuth не настроен</p>
+          <p class="text-muted">Добавьте TELEGRAM_OAUTH_BOT_TOKEN и TELEGRAM_OAUTH_BOT_USERNAME в .env</p>
+        </div>
+      {% endif %}
     </div>
 
     <div class="auth-footer" style="margin-top: 32px;">

@@ -21,9 +21,13 @@ services:
       # База данных (SQLite в volume)
       - DATABASE_URL=sqlite+aiosqlite:///data/neuromagic.db
 
-      # Telegram bot для заявок
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      # Telegram OAuth (для авторизации)
+      - TELEGRAM_OAUTH_BOT_TOKEN=${TELEGRAM_OAUTH_BOT_TOKEN}
+      - TELEGRAM_OAUTH_BOT_USERNAME=${TELEGRAM_OAUTH_BOT_USERNAME}
+
+      # Telegram notifications (для отправки заявок в группу)
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
 
       # SMTP для email верификации
       - SMTP_HOST=${SMTP_HOST}
