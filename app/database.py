@@ -1,7 +1,9 @@
 """
-Настройка базы данных SQLite с SQLAlchemy.
+Настройка базы данных с SQLAlchemy.
+Поддерживает PostgreSQL (production) и SQLite (development).
 Использует асинхронный движок для работы с Quart.
 """
+import os
 from pathlib import Path
 from typing import AsyncGenerator
 
@@ -9,15 +11,23 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from app.models import Base
 
-# Путь к файлу БД
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATABASE_URL = f"sqlite+aiosqlite:///{BASE_DIR}/neuromagic.db"
+# Получаем DATABASE_URL из переменной окружения
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Если не задан, используем SQLite по умолчанию (для разработки)
+if not DATABASE_URL:
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    DATABASE_URL = f"sqlite+aiosqlite:///{BASE_DIR}/neuromagic.db"
 
 # Создание асинхронного движка
 engine = create_async_engine(
     DATABASE_URL,
     echo=False,  # Установить в True для отладки SQL-запросов
     future=True,
+    # Для PostgreSQL добавляем pool settings
+    pool_pre_ping=True,  # Проверка соединения перед использованием
+    pool_size=10,  # Размер пула соединений
+    max_overflow=20,  # Максимум дополнительных соединений
 )
 
 # Фабрика сессий

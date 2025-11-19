@@ -1,4 +1,23 @@
 services:
+  # PostgreSQL база данных
+  postgres:
+    image: postgres:16-alpine
+    container_name: neuromagic-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-neuromagic}
+      - POSTGRES_USER=${POSTGRES_USER:-neuromagic_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-this-password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - neuromagic-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-neuromagic_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Основное приложение Нейромагии
   app:
     build:
@@ -9,17 +28,17 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # База данных (персистентность)
-      - ./data:/app/data
       # Логи
       - ./logs:/app/logs
+      # Бэкапы БД
+      - ./backups:/app/backups
     environment:
       # Основные настройки
       - SECRET_KEY=${SECRET_KEY:-change-this-in-production}
       - APP_ENV=${APP_ENV:-production}
 
-      # База данных (SQLite в volume)
-      - DATABASE_URL=sqlite+aiosqlite:///data/neuromagic.db
+      # База данных (PostgreSQL)
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-neuromagic_user}:${POSTGRES_PASSWORD:-change-this-password}@postgres:5432/${POSTGRES_DB:-neuromagic}
 
       # Telegram OAuth (для авторизации)
       - TELEGRAM_OAUTH_BOT_TOKEN=${TELEGRAM_OAUTH_BOT_TOKEN}
@@ -40,6 +59,9 @@ services:
       # Контакты
       - CONTACT_EMAIL=${CONTACT_EMAIL:-hello@neuro-magic.ru}
       - SITE_NAME=${SITE_NAME:-Нейромагия}
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - neuromagic-network
     healthcheck:
@@ -77,7 +99,7 @@ networks:
     driver: bridge
 
 volumes:
-  # Volumes для персистентности
-  app-data:
+  # PostgreSQL данные
+  postgres-data:
     driver: local
 
