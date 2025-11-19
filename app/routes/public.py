@@ -60,3 +60,11 @@ async def about():
         "about.html",
         page_title="О нас — Нейромагия",
     )
+
+
+@bp.get("/terms")
+async def terms():
+    return await render_template(
+        "terms.html",
+        page_title="Пользовательское соглашение — Нейромагия",
+    )

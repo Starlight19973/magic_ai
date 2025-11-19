@@ -61,6 +61,21 @@
         <span class="form-hint">Минимум 6 символов</span>
       </div>
 
+      <div class="form-group form-group--checkbox">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            name="agree_terms" 
+            required
+            class="checkbox-input"
+          />
+          <span class="checkbox-text">
+            Я принимаю условия 
+            <a href="{{ url_for('public.terms') }}" target="_blank" rel="noopener">Пользовательского соглашения</a>
+          </span>
+        </label>
+      </div>
+
       <button type="submit" class="btn btn--primary btn--full">
         Зарегистрироваться
       </button>
