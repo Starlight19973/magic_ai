@@ -1,0 +1,17 @@
+{
+  "name": "Нейромагия",
+  "short_name": "Нейромагия",
+  "description": "Курсы по работе с искусственным интеллектом",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f23",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/static/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
+
