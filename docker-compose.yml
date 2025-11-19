@@ -17,14 +17,22 @@ services:
       # Основные настройки
       - SECRET_KEY=${SECRET_KEY:-change-this-in-production}
       - APP_ENV=${APP_ENV:-production}
-      
+
       # База данных (SQLite в volume)
       - DATABASE_URL=sqlite+aiosqlite:///data/neuromagic.db
-      
+
       # Telegram bot для заявок
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
-      
+
+      # SMTP для email верификации
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME:-Нейромагия}
+
       # Контакты
       - CONTACT_EMAIL=${CONTACT_EMAIL:-hello@neuro-magic.ru}
       - SITE_NAME=${SITE_NAME:-Нейромагия}
