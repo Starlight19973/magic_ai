@@ -12,9 +12,21 @@ from app.models import Base
 # Путь к файлу БД
 import os
 BASE_DIR = Path(__file__).resolve().parent.parent
-# Используем переменную окружения или дефолтный путь в data/
-DATABASE_PATH = os.getenv("DATABASE_URL", f"sqlite+aiosqlite:///{BASE_DIR}/data/neuromagic.db")
-DATABASE_URL = DATABASE_PATH
+
+# Проверяем переменную окружения DATABASE_URL
+# В Docker она уже установлена в docker-compose.yml как sqlite+aiosqlite:///data/neuromagic.db
+db_url = os.getenv("DATABASE_URL")
+if db_url and db_url.startswith("sqlite"):
+    # Если это относительный путь SQLite, делаем его абсолютным
+    if not db_url.startswith("sqlite+aiosqlite:///"):
+        # Преобразуем относительный путь в абсолютный
+        db_path = db_url.replace("sqlite+aiosqlite://", "")
+        DATABASE_URL = f"sqlite+aiosqlite:///{BASE_DIR}/{db_path}"
+    else:
+        DATABASE_URL = db_url
+else:
+    # Fallback для локальной разработки
+    DATABASE_URL = f"sqlite+aiosqlite:///{BASE_DIR}/neuromagic.db"
 
 # Создание асинхронного движка
 engine = create_async_engine(
