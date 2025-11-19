@@ -658,6 +658,94 @@ p, ul, ol {
   margin-top: 4px !important;
 }
 
+/* КОНТАКТЫ И РЕКВИЗИТЫ */
+.contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin: 40px 0;
+}
+
+.contact-card {
+  background: #fff;
+  border: 2px solid var(--magic-border);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--magic-primary);
+  box-shadow: 0 12px 40px rgba(var(--magic-primary-rgb), 0.12);
+}
+
+.contact-card__icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.contact-card h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--magic-text);
+  margin-bottom: 12px;
+}
+
+.contact-card a {
+  color: var(--magic-primary);
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: color 0.3s ease;
+}
+
+.contact-card a:hover {
+  color: var(--magic-secondary);
+}
+
+.requisites-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+  border: 2px solid var(--magic-border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 40px;
+}
+
+.requisites-card h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--magic-text);
+  margin-bottom: 24px;
+}
+
+.requisites-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.requisite-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--magic-border);
+}
+
+.requisite-label {
+  font-weight: 600;
+  color: var(--magic-muted);
+  min-width: 100px;
+}
+
+.requisite-value {
+  font-weight: 600;
+  color: var(--magic-text);
+  font-size: 1.05rem;
+}
+
 .site-footer__column--right {
   text-align: right;
   align-items: flex-end;
