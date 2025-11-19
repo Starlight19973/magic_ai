@@ -1,0 +1,49 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /opt/neuromagic
+            
+            # Останавливаем контейнеры
+            docker-compose down
+            
+            # Обновляем код
+            git pull origin main
+            
+            # Пересобираем образы
+            docker-compose build --no-cache
+            
+            # Запускаем с nginx
+            docker-compose --profile production up -d
+            
+            # Проверяем статус
+            docker-compose ps
+            
+            # Показываем логи
+            docker-compose logs --tail=50
+      
+      - name: Health Check
+        run: |
+          sleep 10
+          curl -f http://138.124.15.60 || exit 1
+
