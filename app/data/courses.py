@@ -493,6 +493,10 @@ COURSES_EXTENDED = {
 }
 
 
+# Алиас для обратной совместимости
+COURSES = COURSES_EXTENDED
+
+
 def get_course_full_data(slug: str) -> Dict:
     """Получить полные данные курса по slug"""
     return COURSES_EXTENDED.get(slug, {})

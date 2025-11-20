@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Оплата отменена - {{ settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 100px auto; padding: 40px 20px;">
+    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 60px 40px; text-align: center; backdrop-filter: blur(10px);">
+        <!-- Иконка -->
+        <div style="width: 120px; height: 120px; margin: 0 auto 30px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 40px rgba(245, 158, 11, 0.3);">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+        </div>
+
+        <!-- Заголовок -->
+        <h1 style="font-size: 36px; font-weight: 700; margin: 0 0 20px; background: linear-gradient(135deg, #f59e0b, #d97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            Оплата отменена
+        </h1>
+
+        <p style="font-size: 18px; color: rgba(255, 255, 255, 0.7); margin: 0 0 40px; line-height: 1.6;">
+            Вы отменили процесс оплаты. Не беспокойтесь, средства не были списаны с вашего счета.
+        </p>
+
+        <!-- Информация -->
+        <div style="background: rgba(245, 158, 11, 0.1); border: 2px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 30px; margin: 0 0 40px; text-align: left;">
+            <h3 style="font-size: 22px; font-weight: 600; margin: 0 0 20px; color: #f59e0b;">
+                Хотите попробовать снова?
+            </h3>
+            <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6; margin: 0;">
+                Если у вас возникли проблемы с оплатой или вопросы по курсу, напишите нам на
+                <a href="mailto:hello@neuro-magic.ru" style="color: #f59e0b; text-decoration: underline;">hello@neuro-magic.ru</a>
+                — мы с радостью поможем!
+            </p>
+        </div>
+
+        <!-- Кнопки -->
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <a href="/courses" class="btn btn-primary" style="padding: 15px 40px; font-size: 16px; text-decoration: none;">
+                Вернуться к курсам
+            </a>
+            <a href="/" class="btn btn-outline" style="padding: 15px 40px; font-size: 16px; text-decoration: none; background: transparent; border: 2px solid rgba(255, 255, 255, 0.2);">
+                На главную
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.btn {
+    display: inline-block;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+}
+
+.btn-outline {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+</style>
+{% endblock %}

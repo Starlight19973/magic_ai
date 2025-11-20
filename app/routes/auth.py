@@ -3,6 +3,7 @@
 Использует Quart-Auth для управления сессиями.
 """
 from quart import Blueprint, redirect, render_template, request, session, url_for, flash, jsonify
+from quart_auth import login_user, logout_user, AuthUser
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
@@ -254,12 +255,15 @@ async def register_verify():
             # Очищаем временные данные
             session.pop("reg_data", None)
 
-            # Авторизация после регистрации
+            # Авторизация после регистрации через Quart-Auth
+            login_user(AuthUser(new_user.id))
+
+            # Дополнительно сохраняем данные в сессию
             session["user_id"] = new_user.id
             session["username"] = new_user.username
             session["avatar_url"] = new_user.avatar_url
 
-            logger.info(f"User {new_user.username} successfully registered")
+            logger.info(f"User {new_user.username} successfully registered and logged in")
 
             return redirect(url_for("public.index"))
 
@@ -365,11 +369,15 @@ async def login():
             elif not user.is_active:
                 errors.append("Аккаунт деактивирован")
             else:
-                # Успешная авторизация
+                # Успешная авторизация через Quart-Auth
+                login_user(AuthUser(user.id))
+
+                # Дополнительно сохраняем данные в сессию для использования в шаблонах
                 session["user_id"] = user.id
                 session["username"] = user.username
                 session["avatar_url"] = user.avatar_url
-                
+
+                logger.info(f"User {user.username} logged in successfully")
                 return redirect(url_for("public.index"))
             
             if errors:
@@ -407,8 +415,66 @@ async def logout():
     Выход из системы.
     Очищает сессию и редиректит на главную.
     """
+    logout_user()
     session.clear()
     return redirect(url_for("public.index"))
+
+
+# ============================================
+# ЛИЧНЫЙ КАБИНЕТ (ПРОФИЛЬ)
+# ============================================
+@bp.route("/profile")
+async def profile():
+    """
+    Личный кабинет пользователя.
+    Показывает информацию о профиле, купленные курсы, статистику.
+    """
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("auth.login"))
+
+    try:
+        async for db in get_session():
+            # Получаем пользователя
+            result = await db.execute(select(User).where(User.id == user_id))
+            user = result.scalar_one_or_none()
+
+            if not user:
+                session.clear()
+                return redirect(url_for("auth.login"))
+
+            # Получаем купленные курсы
+            from app.models import UserCourse
+            courses_result = await db.execute(
+                select(UserCourse)
+                .where(UserCourse.user_id == user_id)
+                .order_by(UserCourse.purchased_at.desc())
+            )
+            purchased_courses = list(courses_result.scalars().all())
+
+            # Получаем информацию о курсах
+            from app.services.courses import get_course_by_slug
+            courses_info = []
+            for uc in purchased_courses:
+                course = get_course_by_slug(uc.course_slug)
+                if course:
+                    courses_info.append({
+                        "course": course,
+                        "purchased_at": uc.purchased_at,
+                        "status": uc.status
+                    })
+
+            return await render_template(
+                "profile.html",
+                user=user,
+                purchased_courses=courses_info,
+                page_title=f"Профиль: {user.username}"
+            )
+
+    except Exception as e:
+        logger.error(f"Profile error: {str(e)}")
+        await flash("Произошла ошибка при загрузке профиля", "error")
+        return redirect(url_for("public.index"))
 
 
 # ============================================
@@ -519,7 +585,10 @@ async def telegram_callback():
 
                 logger.info(f"User logged in via Telegram: {user.username} (TG ID: {telegram_id})")
 
-            # Авторизация
+            # Авторизация через Quart-Auth
+            login_user(AuthUser(user.id))
+
+            # Дополнительно сохраняем данные в сессию
             session["user_id"] = user.id
             session["username"] = user.username
             session["avatar_url"] = user.avatar_url

@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-page">
+  <div class="profile-header">
+    <div class="profile-header__avatar">
+      <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="profile-avatar">
+    </div>
+    <div class="profile-header__info">
+      <h1 class="profile-header__title">{{ user.username }}</h1>
+      <p class="profile-header__email">{{ user.email }}</p>
+      {% if user.telegram_username %}
+      <p class="profile-header__telegram">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M14.5 1.5l-13 5 3.5 1.5 1.5 4.5 2-2 4 3 2-11zM5 8l7-4-5 6-2-2z"/>
+        </svg>
+        @{{ user.telegram_username }}
+      </p>
+      {% endif %}
+      <p class="profile-header__joined">Зарегистрирован: {{ user.created_at.strftime('%d.%m.%Y') }}</p>
+    </div>
+  </div>
+
+  <!-- Статистика -->
+  <div class="profile-stats">
+    <div class="stat-card">
+      <div class="stat-card__icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+          <path d="M16 3l4 8 9 1-6.5 6.3 1.5 9-8-4.2-8 4.2 1.5-9L3 12l9-1 4-8z"/>
+        </svg>
+      </div>
+      <div class="stat-card__value">{{ purchased_courses|length }}</div>
+      <div class="stat-card__label">Курсов куплено</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card__icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+          <path d="M16 4C9.4 4 4 9.4 4 16s5.4 12 12 12 12-5.4 12-12S22.6 4 16 4zm0 22c-5.5 0-10-4.5-10-10S10.5 6 16 6s10 4.5 10 10-4.5 10-10 10z"/>
+        </svg>
+      </div>
+      <div class="stat-card__value">0%</div>
+      <div class="stat-card__label">Средний прогресс</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card__icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+          <path d="M28 6H4v20h24V6zM8 22l6-8 4 5 6-8v13H8V22z"/>
+        </svg>
+      </div>
+      <div class="stat-card__value">0</div>
+      <div class="stat-card__label">Уроков пройдено</div>
+    </div>
+  </div>
+
+  <!-- Купленные курсы -->
+  <div class="profile-section">
+    <h2 class="profile-section__title">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z"/>
+      </svg>
+      Мои курсы
+    </h2>
+
+    {% if purchased_courses %}
+    <div class="profile-courses-grid">
+      {% for item in purchased_courses %}
+      <div class="profile-course-card">
+        <div class="profile-course-card__header">
+          <img src="{{ item.course.cover }}" alt="{{ item.course.title }}" class="profile-course-card__cover">
+          <div class="profile-course-card__overlay">
+            <div class="profile-course-card__badges">
+              {% for badge in item.course.badges %}
+              <span class="badge badge--small">{{ badge }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-course-card__body">
+          <h3 class="profile-course-card__title">{{ item.course.title }}</h3>
+          <p class="profile-course-card__tagline">{{ item.course.tagline }}</p>
+
+          <div class="profile-course-card__meta">
+            <span class="meta-badge">Куплен {{ item.purchased_at.strftime('%d.%m.%Y') }}</span>
+            <span class="meta-badge meta-badge--{{ item.status }}">{{ item.status }}</span>
+          </div>
+
+          <a href="{{ url_for('courses.my_course', slug=item.course.slug) }}" class="btn btn--primary btn--full btn--glow">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M6 4l8 6-8 6V4z" fill="currentColor"/>
+            </svg>
+            Перейти к курсу
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state__icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <path d="M32 8l8 16 18 2-13 13 3 18-16-8-16 8 3-18-13-13 18-2 8-16z" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+      <h3 class="empty-state__title">У вас пока нет курсов</h3>
+      <p class="empty-state__text">Начните своё путешествие в мир AI прямо сейчас!</p>
+      <a href="{{ url_for('public.index') }}#catalog" class="btn btn--primary btn--large btn--glow">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 3v14M3 10h14" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Выбрать курс
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Действия -->
+  <div class="profile-actions">
+    <a href="{{ url_for('courses.my_courses') }}" class="btn btn--ghost">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      Все мои курсы
+    </a>
+    <a href="{{ url_for('public.index') }}#catalog" class="btn btn--ghost">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M3 3h14M3 7h14M3 11h14M3 15h10" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      Каталог курсов
+    </a>
+    <a href="{{ url_for('auth.logout') }}" class="btn btn--danger">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M13 3h4v14h-4M7 7l-4 3 4 3M3 10h11" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      Выйти
+    </a>
+  </div>
+</div>
+
+<style>
+.profile-page {
+  min-height: 100vh;
+  padding: 100px 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.profile-header {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+  border-radius: 20px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  margin-bottom: 2rem;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+}
+
+.profile-header__info {
+  flex: 1;
+}
+
+.profile-header__title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.profile-header__email {
+  color: #a0a0a0;
+  font-size: 1rem;
+  margin: 0.25rem 0;
+}
+
+.profile-header__telegram {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3b82f6;
+  font-size: 0.9rem;
+  margin: 0.25rem 0;
+}
+
+.profile-header__joined {
+  color: #808080;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0 0;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  padding: 2rem;
+  background: rgba(20, 20, 30, 0.6);
+  border-radius: 15px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+}
+
+.stat-card__icon {
+  color: #8b5cf6;
+  margin-bottom: 1rem;
+}
+
+.stat-card__value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card__label {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+}
+
+.profile-section {
+  margin-bottom: 3rem;
+}
+
+.profile-section__title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
+
+.profile-courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.profile-course-card {
+  background: rgba(20, 20, 30, 0.6);
+  border-radius: 15px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.profile-course-card:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(139, 92, 246, 0.2);
+}
+
+.profile-course-card__header {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.profile-course-card__cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-course-card__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.profile-course-card__badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-course-card__body {
+  padding: 1.5rem;
+}
+
+.profile-course-card__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+}
+
+.profile-course-card__tagline {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  margin: 0 0 1rem 0;
+}
+
+.profile-course-card__meta {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  padding: 0.25rem 0.75rem;
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #8b5cf6;
+}
+
+.meta-badge--paid {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.meta-badge--active {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.meta-badge--completed {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 2rem 0;
+}
+
+.btn--danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn--danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-state__icon {
+  margin-bottom: 1.5rem;
+  color: #8b5cf6;
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.empty-state__text {
+  color: #a0a0a0;
+  margin-bottom: 2rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-header__title {
+    font-size: 1.5rem;
+  }
+
+  .profile-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card__value {
+    font-size: 2rem;
+  }
+}
+</style>
+{% endblock %}
