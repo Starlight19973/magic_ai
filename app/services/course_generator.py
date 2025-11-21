@@ -79,16 +79,15 @@ class CourseGeneratorService:
 Создай подробный, практический и интересный урок в формате Markdown.
 Используй примеры из реальной жизни и практические кейсы."""
 
-        # Генерируем текст урока
-        lesson_text = await self.openrouter.generate_text(
+        # Генерируем текст урока с помощью Gemini с reasoning
+        lesson_text = await self.openrouter.generate_text_with_reasoning(
             prompt=user_prompt,
             system_prompt=system_prompt.format(
                 duration=duration_minutes,
                 words=duration_minutes * 150  # ~150 слов в минуту
             ),
-            model="openai/gpt-4o-mini",  # Используем более быструю модель
             temperature=0.7,
-            max_tokens=4000
+            max_tokens=8000  # Увеличено для более подробного контента
         )
 
         if not lesson_text:
@@ -152,13 +151,12 @@ class CourseGeneratorService:
 
 Верни ТОЛЬКО валидный JSON без дополнительного текста."""
 
-        # Генерируем квиз
-        quiz_text = await self.openrouter.generate_text(
+        # Генерируем квиз с помощью Gemini с reasoning
+        quiz_text = await self.openrouter.generate_text_with_reasoning(
             prompt=user_prompt,
             system_prompt=system_prompt,
-            model="openai/gpt-4o-mini",
             temperature=0.5,
-            max_tokens=2000
+            max_tokens=3000
         )
 
         if not quiz_text:
