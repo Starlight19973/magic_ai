@@ -92,6 +92,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./static:/app/static:ro
+      - /var/www/certbot:/var/www/certbot:ro  # Для Let's Encrypt верификации
     depends_on:
       - app
     networks:
@@ -105,7 +106,7 @@ services:
     labels:
       - "com.neuromagic.service=nginx"
       - "com.neuromagic.version=1.2"
-      - "com.neuromagic.updated=2025-11-20"
+      - "com.neuromagic.updated=2025-11-22"
 
 networks:
   neuromagic-network:
