@@ -6,6 +6,7 @@ from .payment import Payment
 from .course_module import CourseModule
 from .lesson import Lesson
 from .user_lesson_progress import UserLessonProgress
+from .login_attempt import LoginAttempt
 
 __all__ = [
     "User",
@@ -16,5 +17,6 @@ __all__ = [
     "CourseModule",
     "Lesson",
     "UserLessonProgress",
+    "LoginAttempt",
 ]
 

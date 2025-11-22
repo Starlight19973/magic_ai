@@ -67,6 +67,14 @@ def create_app() -> Quart:
     async def inject_globals():
         return {"settings": settings}
 
+    # Middleware для проверки срока действия сессии
+    from app.middleware.session import check_session_expiry
+    
+    @app.before_request
+    async def before_request():
+        """Проверка срока действия сессии перед каждым запросом"""
+        await check_session_expiry()
+
     # Инициализация базы данных при старте приложения
     @app.before_serving
     async def startup():

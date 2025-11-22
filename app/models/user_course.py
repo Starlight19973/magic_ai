@@ -19,7 +19,7 @@ class UserCourse(Base):
     # Информация о покупке
     purchased_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     price_paid = Column(Numeric(10, 2), nullable=False)  # цена в рублях
-    payment_method = Column(String(50), default="mock")  # mock, yookassa, etc
+    payment_method = Column(String(50), default="mock")  # mock, etc
     
     # Статус доступа
     status = Column(

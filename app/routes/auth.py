@@ -1,6 +1,7 @@
 """
 Роуты для авторизации: регистрация, вход, выход, Telegram OAuth.
 Использует Quart-Auth для управления сессиями.
+Включает rate limiting для защиты от подбора паролей.
 """
 from quart import Blueprint, redirect, render_template, request, session, url_for, flash, jsonify
 from quart_auth import login_user, logout_user, AuthUser
@@ -15,6 +16,7 @@ from app.database import get_session
 from app.models import User, EmailVerification
 from app.schemas.auth import LoginForm, RegisterForm
 from app.services.email import send_verification_email, generate_verification_code
+from app.utils.rate_limit import check_rate_limit, record_failed_login, reset_login_attempts
 from pydantic import ValidationError
 from loguru import logger
 
@@ -262,6 +264,7 @@ async def register_verify():
             session["user_id"] = new_user.id
             session["username"] = new_user.username
             session["avatar_url"] = new_user.avatar_url
+            session["login_time"] = datetime.utcnow().isoformat()  # Время входа для проверки срока
 
             logger.info(f"User {new_user.username} successfully registered and logged in")
 
@@ -328,15 +331,16 @@ async def register_resend():
 @bp.route("/login", methods=["GET", "POST"])
 async def login():
     """
-    Форма входа в систему.
+    Форма входа в систему с защитой от подбора паролей.
     
     GET: отображает форму входа
     POST: проверяет логин и пароль, создаёт сессию
     
     Логика:
+    - rate limiting по IP адресу
     - поиск пользователя по username или email
     - проверка пароля
-    - создание сессии
+    - создание сессии с временем входа (24 часа)
     """
     if request.method == "GET":
         return await render_template("auth/login.html", page_title="Вход")
@@ -344,6 +348,11 @@ async def login():
     # Обработка POST запроса
     form_data = await request.form
     errors = []
+    
+    # Получаем IP адрес для rate limiting
+    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if ip_address and ',' in ip_address:
+        ip_address = ip_address.split(',')[0].strip()
     
     try:
         # Валидация данных
@@ -353,6 +362,17 @@ async def login():
         )
         
         async for db in get_session():
+            # Rate limiting - проверяем по IP адресу
+            is_allowed, error_msg = await check_rate_limit(db, ip_address)
+            if not is_allowed:
+                errors.append(error_msg)
+                return await render_template(
+                    "auth/login.html",
+                    errors=errors,
+                    form_data=form_data,
+                    page_title="Вход"
+                )
+            
             # Поиск пользователя (по username или email)
             result = await db.execute(
                 select(User).where(
@@ -364,20 +384,26 @@ async def login():
             # Проверка существования и пароля
             if not user:
                 errors.append("Неверный логин или пароль")
+                await record_failed_login(db, ip_address)
             elif not user.check_password(form.password):
                 errors.append("Неверный логин или пароль")
+                await record_failed_login(db, ip_address)
             elif not user.is_active:
                 errors.append("Аккаунт деактивирован")
             else:
-                # Успешная авторизация через Quart-Auth
+                # Успешная авторизация - сбрасываем счетчик попыток
+                await reset_login_attempts(db, ip_address)
+                
+                # Авторизация через Quart-Auth
                 login_user(AuthUser(user.id))
 
                 # Дополнительно сохраняем данные в сессию для использования в шаблонах
                 session["user_id"] = user.id
                 session["username"] = user.username
                 session["avatar_url"] = user.avatar_url
+                session["login_time"] = datetime.utcnow().isoformat()  # Время входа для проверки срока
 
-                logger.info(f"User {user.username} logged in successfully")
+                logger.info(f"User {user.username} logged in successfully from {ip_address}")
                 return redirect(url_for("public.index"))
             
             if errors:
@@ -397,6 +423,7 @@ async def login():
             page_title="Вход"
         )
     except Exception as e:
+        logger.error(f"Login error: {str(e)}")
         errors = [f"Ошибка входа: {str(e)}"]
         return await render_template(
             "auth/login.html",
@@ -592,6 +619,7 @@ async def telegram_callback():
             session["user_id"] = user.id
             session["username"] = user.username
             session["avatar_url"] = user.avatar_url
+            session["login_time"] = datetime.utcnow().isoformat()  # Время входа для проверки срока
 
             return redirect(url_for("public.index"))
 
