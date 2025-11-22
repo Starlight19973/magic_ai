@@ -17,7 +17,7 @@ COURSES: list[Course] = [
         format="live",
         technologies=["ChatGPT", "Claude", "Gemini", "Notion AI"],
         badges=["Новичкам", "Практика"],
-        cover="https://images.unsplash.com/photo-1677442136019-21780ecad995",
+        cover="/static/images_magic/ai_forwork.jfif",
         highlight="Начните использовать AI уже на первой неделе обучения, без технического бэкграунда.",
         author=Author(
             name="Анна Светова",
@@ -39,7 +39,7 @@ COURSES: list[Course] = [
         format="hybrid",
         technologies=["V0", "Bolt.new", "Cursor AI", "Replit", "Lovable"],
         badges=["No-Code", "Тренд"],
-        cover="https://images.unsplash.com/photo-1633356122544-f134324a6cee",
+        cover="/static/images_magic/vibe_coding.jfif",
         highlight="От идеи до MVP за 5 недель. Реальный проект в портфолио без знания программирования.",
         author=Author(
             name="Максим Вайбер",
@@ -61,7 +61,7 @@ COURSES: list[Course] = [
         format="live",
         technologies=["Midjourney", "DALL-E", "Stable Diffusion", "Leonardo AI"],
         badges=["Дизайн", "Креатив"],
-        cover="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe",
+        cover="/static/images_magic/Generate_visual.jfif",
         highlight="Создавайте визуал для соцсетей, презентаций и бизнеса без дизайнера.",
         author=Author(
             name="Дарья Артова",
@@ -83,7 +83,7 @@ COURSES: list[Course] = [
         format="hybrid",
         technologies=["ChatGPT", "Jasper", "Copy.ai", "Writesonic"],
         badges=["Контент", "Маркетинг"],
-        cover="https://images.unsplash.com/photo-1455390582262-044cdead277a",
+        cover="/static/images_magic/ai_copyright.jfif",
         highlight="Генерируйте качественный контент в 10 раз быстрее с помощью AI-инструментов.",
         author=Author(
             name="Елена Словова",
@@ -105,7 +105,7 @@ COURSES: list[Course] = [
         format="live",
         technologies=["ComfyUI", "Stable Diffusion", "After Effects"],
         badges=["Design", "Visual"],
-        cover="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+        cover="/static/images_magic/comfyui.jfif",
         highlight="Получите уверенный стек для создания визуала под бренд без подрядчиков.",
         author=Author(
             name="Савва Лис",
@@ -127,7 +127,7 @@ COURSES: list[Course] = [
         format="hybrid",
         technologies=["Make", "n8n", "Zapier", "OpenAI API"],
         badges=["Automation", "Ops"],
-        cover="https://images.unsplash.com/photo-1521737604893-d14cc237f11d",
+        cover="/static/images_magic/ai_automatisation.jfif",
         highlight="Запустите автоматизированные пайплайны и освободите часы команды.",
         author=Author(
             name="Маргарита Шторм",
@@ -149,7 +149,7 @@ COURSES: list[Course] = [
         format="live",
         technologies=["SpeechKit", "ElevenLabs", "LangChain"],
         badges=["Voice", "CX"],
-        cover="https://images.unsplash.com/photo-1521737604893-d14cc237f11d",
+        cover="/static/images_magic/voice_assist.jfif",
         highlight="Соберёте голосового помощника, который закрывает задачи поддержки и продаж.",
         author=Author(
             name="Остап Янтарь",
@@ -171,7 +171,7 @@ COURSES: list[Course] = [
         format="hybrid",
         technologies=["pgvector", "Neo4j", "LangSmith", "FastAPI"],
         badges=["RAG", "Data"],
-        cover="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+        cover="/static/images_magic/rag_system.jfif",
         highlight="Настроите поиск по документам и чат с памятью для вашей команды.",
         author=Author(
             name="Ева Кобальт",
@@ -193,7 +193,7 @@ COURSES: list[Course] = [
         format="recorded",
         technologies=["OpenAI API", "YandexGPT", "Vertex AI"],
         badges=["Leadership", "Strategy"],
-        cover="https://images.unsplash.com/photo-1482192505345-5655af888cc4",
+        cover="/static/images_magic/ai_for_business.jfif",
         highlight="Сформируете понятный план по развитию нейросетей в бизнесе.",
         author=Author(
             name="Инга Вуаль",
@@ -208,19 +208,31 @@ REVIEWS: list[Review] = [
         author="Лев Васильев",
         role="CMO, Macan Digital",
         quote="За первую неделю внедрили промт-воркфлоу из курса и удвоили выработку контента.",
-        avatar="https://images.unsplash.com/photo-1544005313-94ddf0286df2",
+        avatar="https://images.unsplash.com/photo-1521572267360-ee0c2909d518",
     ),
     Review(
         author="Алина Рудая",
         role="Product Owner, EdTech Lab",
         quote="Истории из практики помогли убедить команду в ценности ИИ, теперь строим RAG.",
-        avatar="https://images.unsplash.com/photo-1521572267360-ee0c2909d518",
+        avatar="https://images.unsplash.com/photo-1544005313-94ddf0286df2",
     ),
     Review(
         author="Илья Озёрный",
         role="CEO, WowStudio",
         quote="Нейромагический UI влюбляет клиентов. Команда даёт поддержку и честную экспертизу.",
         avatar="https://images.unsplash.com/photo-1544723795-3fb6469f5b39",
+    ),
+    Review(
+        author="Марина Светлова",
+        role="Начинающий маркетолог",
+        quote="Никогда не думала, что смогу создавать дизайн сама. После курса по Midjourney делаю картинки для соцсетей за 5 минут!",
+        avatar="https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+    ),
+    Review(
+        author="Дмитрий Новиков",
+        role="Студент, без опыта в IT",
+        quote="Пришёл полным новичком, боялся что не разберусь. Преподаватели объясняют так просто, что через месяц уже помогаю друзьям с ChatGPT!",
+        avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
     ),
 ]
 

@@ -467,18 +467,34 @@ p, ul, ol {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 36px;
+  padding: 0;
   background: var(--magic-panel);
   border: 1px solid var(--magic-border);
   border-radius: 20px;
   backdrop-filter: blur(20px);
   transition: all 0.4s ease;
+  overflow: hidden;
 }
 
 .course-card:hover {
   transform: translateY(-8px);
   border-color: var(--magic-primary);
   box-shadow: 0 16px 48px rgba(168, 85, 247, 0.25);
+}
+
+.course-card__image {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+.course-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px 36px 36px;
+  flex: 1;
 }
 
 .course-card__badge {
@@ -849,7 +865,14 @@ p, ul, ol {
     padding: 32px 24px;
   }
 
-  .course-card,
+  .course-card__content {
+    padding: 20px 24px 24px;
+  }
+
+  .course-card__image {
+    height: 200px;
+  }
+
   .review {
     padding: 24px;
   }
@@ -2299,4 +2322,121 @@ p, ul, ol {
   .quest-cta__actions .btn {
     width: 100%;
   }
+}
+
+/* ============================================
+   COURSE LEARNING PAGE - Orange Magic Theme
+   ============================================ */
+.learn-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba(17, 8, 36, 0.95), rgba(30, 15, 5, 0.95));
+}
+
+.learn-sidebar {
+  background: linear-gradient(180deg, rgba(17, 8, 36, 0.98), rgba(6, 1, 15, 0.98));
+  border-right: 1px solid rgba(255, 138, 0, 0.2);
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #ff8c00, #ffa500, #ffb84d) !important;
+  box-shadow: 0 2px 20px rgba(255, 140, 0, 0.5);
+}
+
+.lesson-item.active a {
+  background: rgba(255, 140, 0, 0.15);
+  border-left: 3px solid #ff8c00;
+  color: #ffb84d;
+}
+
+.lesson-item.completed .lesson-status {
+  color: #10b981;
+}
+
+.lesson-item.active .lesson-status {
+  color: #ff8c00;
+}
+
+.lesson-content h2 {
+  border-left: 4px solid #ff8c00;
+  padding-left: 16px;
+  color: #ffb84d;
+}
+
+.lesson-content h3 {
+  color: #ffa500;
+}
+
+.lesson-content code {
+  background: rgba(255, 140, 0, 0.1);
+  border: 1px solid rgba(255, 140, 0, 0.3);
+  color: #ffb84d;
+}
+
+.lesson-content pre {
+  background: rgba(17, 8, 36, 0.95);
+  border: 1px solid rgba(255, 140, 0, 0.3);
+}
+
+.lesson-content blockquote {
+  border-left: 4px solid #ff8c00;
+  background: rgba(255, 140, 0, 0.05);
+  padding: 16px;
+  margin: 20px 0;
+}
+
+.lesson-content .task-box,
+.lesson-content .practice-box {
+  background: linear-gradient(135deg, rgba(255, 140, 0, 0.1), rgba(255, 165, 0, 0.05));
+  border: 2px solid rgba(255, 140, 0, 0.3);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.lesson-content .checklist {
+  background: rgba(255, 140, 0, 0.05);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.lesson-content .checklist li::before {
+  content: "✓";
+  color: #ff8c00;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.btn--complete-lesson {
+  background: linear-gradient(120deg, #ff8c00, #ffa500);
+  color: white;
+  box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn--complete-lesson:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(255, 140, 0, 0.6);
+}
+
+.lesson-navigation .btn--next {
+  background: linear-gradient(120deg, #ff8c00, #ffa500);
+  border-color: #ff8c00;
+}
+
+.lesson-navigation .btn--next:hover {
+  box-shadow: 0 8px 24px rgba(255, 140, 0, 0.5);
+}
+
+/* Magic sparkles for completed lessons */
+.lesson-item.completed::after {
+  content: "✨";
+  position: absolute;
+  right: 12px;
+  font-size: 14px;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
 }

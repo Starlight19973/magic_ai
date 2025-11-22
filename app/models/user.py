@@ -1,6 +1,6 @@
 """
 Модель пользователя для системы авторизации.
-Использует SQLAlchemy для работы с SQLite.
+Использует SQLAlchemy для работы с PostgreSQL.
 """
 from datetime import datetime
 from typing import Optional

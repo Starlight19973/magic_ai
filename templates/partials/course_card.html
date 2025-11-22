@@ -1,12 +1,15 @@
 <article class="course-card">
-  <p class="course-card__badge">{{ course.badges | join(" • ") }}</p>
-  <h3>{{ course.title }}</h3>
-  <p>{{ course.highlight }}</p>
-  <ul class="course-card__tags">
-    {% for tech in course.technologies[:3] %}
-      <li>{{ tech }}</li>
-    {% endfor %}
-  </ul>
-  <a class="course-card__link" href="/courses/{{ course.slug }}">Узнать подробнее →</a>
+  <img src="{{ course.cover }}" alt="{{ course.title }}" class="course-card__image" loading="lazy">
+  <div class="course-card__content">
+    <p class="course-card__badge">{{ course.badges | join(" • ") }}</p>
+    <h3>{{ course.title }}</h3>
+    <p>{{ course.highlight }}</p>
+    <ul class="course-card__tags">
+      {% for tech in course.technologies[:3] %}
+        <li>{{ tech }}</li>
+      {% endfor %}
+    </ul>
+    <a class="course-card__link" href="/courses/{{ course.slug }}">Узнать подробнее →</a>
+  </div>
 </article>
 
