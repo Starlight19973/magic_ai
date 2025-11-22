@@ -43,7 +43,16 @@ async def init_db() -> None:
     Создаёт все таблицы, определённые в моделях.
     """
     # Импортируем все модели чтобы они были зарегистрированы
-    from app.models import User, UserCourse, EmailVerification  # noqa: F401
+    from app.models import (  # noqa: F401
+        User, 
+        UserCourse, 
+        EmailVerification, 
+        LoginAttempt,
+        Payment,
+        CourseModule,
+        Lesson,
+        UserLessonProgress
+    )
     from loguru import logger
 
     try:
